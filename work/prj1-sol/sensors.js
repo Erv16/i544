@@ -1,11 +1,18 @@
 'use strict';
 
 const assert = require('assert');
+const sensor_data = require('/home/epalani1/cs544/data/sensors/sensor-data.json');
+const sensor = require('/home/epalani1/cs544/data/sensors/sensors.json');
+const sensor_type = require('/home/epalani1/cs544/data/sensors/sensor-types.json');
+const fs = require('fs');
 
 class Sensors {
 
   constructor() {
     //@TODO
+    //console.log(sensor[0]);
+    console.log(sensor_type[0].limits.min);
+    //console.log(sensor_data);
   }
 
   /** Clear out all data from this object. */
@@ -22,6 +29,7 @@ class Sensors {
   async addSensorType(info) {
     const sensorType = validate('addSensorType', info);
     //@TODO
+    sensor_type.push(info);
   }
   
   /** Subject to field validation as per FN_INFOS.addSensor, add
@@ -33,6 +41,7 @@ class Sensors {
   async addSensor(info) {
     const sensor = validate('addSensor', info);
     //@TODO
+    sensor.push(info);
   }
 
   /** Subject to field validation as per FN_INFOS.addSensorData, add
@@ -45,6 +54,8 @@ class Sensors {
   async addSensorData(info) {
     const sensorData = validate('addSensorData', info);
     //@TODO
+    sensor_data.push(info);
+    console.log(sensor_data[sensor_data.length-1]);
   }
 
   /** Subject to validation of search-parameters in info as per
@@ -71,7 +82,24 @@ class Sensors {
   async findSensorTypes(info) {
     const searchSpecs = validate('findSensorTypes', info);
     //@TODO
-    return {};
+    var nextIndex=DEFAULT_COUNT;
+    var data = [];
+    if(Object.getOwnPropertyNames(info).length === 0){
+        for(let i = 0; i < nextIndex; i++){
+          data.push(sensor_type[i]);
+        }
+    }
+    else if(info.quantity){
+      let temp = sensor_type.filter((e) => {return e.quantity === info.quantity})
+      data.push(temp);
+    }
+    else if(info.index || info.count){
+      for(let i = info.index; i < ((+info.index) + (+info.count)); i++){
+        data.push(sensor_type[i]);
+      }
+    }
+    
+    return {data};
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -301,7 +329,7 @@ const FN_INFOS = {
     modelNumber: { }, 
     quantity: { }, 
     unit: { },
-    limits: { type: 'range', },
+    limits: { type: 'range' },
   },
   addSensor:   {
     id: { },
