@@ -11,9 +11,6 @@ class Sensors {
 
   constructor() {
     //@TODO
-    //console.log(sensor[0]);
-    //console.log(sensor_type[0].limits.min);
-    //console.log(sensor_data);
     this.sensor_data=[];
     this.sensor=[];
     this.sensor_type=[];
@@ -22,6 +19,7 @@ class Sensors {
   /** Clear out all data from this object. */
   async clear() {
     //@TODO
+    this.sensor_data=[];
   }
 
   /** Subject to field validation as per FN_INFOS.addSensorType,
@@ -45,14 +43,14 @@ class Sensors {
   async addSensor(info) {
     const sensor = validate('addSensor', info);
     //@TODO
-    var match = false;
+    var check = false;
     for(let i = 0; i < this.sensor_type.length; i++){
       if(info.model === this.sensor_type[i].id){
         this.sensor.push(info);
-        match = true;
+        check = true;
       }
     }
-    if(!match){
+    if(!check){
       throw [ `${info.model} does not contain a valid model id` ];
     }
   }
@@ -67,7 +65,19 @@ class Sensors {
   async addSensorData(info) {
     const sensorData = validate('addSensorData', info);
     //@TODO
-    console.log(info);
+    var check = false;
+    for(let i = 0; i < this.sensor.length; i++){
+      if(info.sensorId === this.sensor[i].id){
+        this.sensor_data.push(info);
+        check = true;
+      }
+    }
+
+    if(!check){
+      throw [ `${info.sensorId} does not exist, data could not be recorded` ];
+    }
+    
+    console.log(this.sensor_data);
   }
 
   /** Subject to validation of search-parameters in info as per
@@ -94,24 +104,26 @@ class Sensors {
   async findSensorTypes(info) {
     const searchSpecs = validate('findSensorTypes', info);
     //@TODO
-    var nextIndex=DEFAULT_COUNT;
+    console.log(searchSpecs);
     var data = [];
-    if(Object.getOwnPropertyNames(info).length === 0){
-        for(let i = 0; i < nextIndex; i++){
-          data.push(sensor_type[i]);
-        }
-    }
-    else if(info.quantity){
-      let temp = sensor_type.filter((e) => {return e.quantity === info.quantity})
-      data.push(temp);
-    }
-    else if(info.index || info.count){
-      for(let i = info.index; i < ((+info.index) + (+info.count)); i++){
-        data.push(sensor_type[i]);
+    var nextIndex = searchSpecs.index;
+    if(info.id){
+      data = this.sensor_type.find(elem => elem['id'] === info.id)
+      if(!data){
+        throw [ `${info.id} is not a valid sensor type` ]
       }
     }
-    
-    return {data};
+    else{
+      for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+        data.push(this.sensor_type[i]);
+        nextIndex++;
+      }
+    }
+    if(nextIndex >= this.sensor_type.length ){
+      nextIndex = -1;
+    }
+    data.sort();
+    return {"nextIndex":nextIndex,data};
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -142,7 +154,18 @@ class Sensors {
   async findSensors(info) {
     const searchSpecs = validate('findSensors', info);
     //@TODO
-    return {};
+    var data = [];
+    var sensorTypeData={};
+    var nextIndex = searchSpecs.index;
+    if(searchSpecs.doDetail){
+
+    }
+    for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+      data.push(this.sensor[i]);
+      nextIndex++;
+    }
+    data.sort();
+    return {"nextIndex":nextIndex,data};
   }
   
   /** Subject to validation of search-parameters in info as per
