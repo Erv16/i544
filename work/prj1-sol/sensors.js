@@ -1,18 +1,22 @@
 'use strict';
 
 const assert = require('assert');
-const sensor_data = require('/home/epalani1/cs544/data/sensors/sensor-data.json');
-const sensor = require('/home/epalani1/cs544/data/sensors/sensors.json');
-const sensor_type = require('/home/epalani1/cs544/data/sensors/sensor-types.json');
-const fs = require('fs');
+// const sensor_data = require('/home/epalani1/cs544/data/sensors/sensor-data.json');
+// const sensor = require('/home/epalani1/cs544/data/sensors/sensors.json');
+// const sensor_type = require('/home/epalani1/cs544/data/sensors/sensor-types.json');
+// const fs = require('fs');
 
 class Sensors {
+
 
   constructor() {
     //@TODO
     //console.log(sensor[0]);
-    console.log(sensor_type[0].limits.min);
+    //console.log(sensor_type[0].limits.min);
     //console.log(sensor_data);
+    this.sensor_data=[];
+    this.sensor=[];
+    this.sensor_type=[];
   }
 
   /** Clear out all data from this object. */
@@ -29,7 +33,7 @@ class Sensors {
   async addSensorType(info) {
     const sensorType = validate('addSensorType', info);
     //@TODO
-    sensor_type.push(info);
+    this.sensor_type.push(info);
   }
   
   /** Subject to field validation as per FN_INFOS.addSensor, add
@@ -41,7 +45,16 @@ class Sensors {
   async addSensor(info) {
     const sensor = validate('addSensor', info);
     //@TODO
-    sensor.push(info);
+    var match = false;
+    for(let i = 0; i < this.sensor_type.length; i++){
+      if(info.model === this.sensor_type[i].id){
+        this.sensor.push(info);
+        match = true;
+      }
+    }
+    if(!match){
+      throw [ `${info.model} does not contain a valid model id` ];
+    }
   }
 
   /** Subject to field validation as per FN_INFOS.addSensorData, add
@@ -54,8 +67,7 @@ class Sensors {
   async addSensorData(info) {
     const sensorData = validate('addSensorData', info);
     //@TODO
-    sensor_data.push(info);
-    console.log(sensor_data[sensor_data.length-1]);
+    console.log(info);
   }
 
   /** Subject to validation of search-parameters in info as per
