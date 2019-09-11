@@ -20,6 +20,7 @@ class Sensors {
   async clear() {
     //@TODO
     this.sensor_data=[];
+    console.log(this.sensor_data);
   }
 
   /** Subject to field validation as per FN_INFOS.addSensorType,
@@ -104,24 +105,33 @@ class Sensors {
   async findSensorTypes(info) {
     const searchSpecs = validate('findSensorTypes', info);
     //@TODO
-    console.log(searchSpecs);
     var data = [];
     var nextIndex = searchSpecs.index;
-    if(info.id){
-      data = this.sensor_type.find(elem => elem['id'] === info.id)
-      if(!data){
-        throw [ `${info.id} is not a valid sensor type` ]
+    if(Object.keys(info).length === 0){
+      for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+            data.push(this.sensor_type[i]);
+            nextIndex++;
+          }
+      if(nextIndex >= this.sensor_type.length ){
+        nextIndex = -1;
       }
     }
     else{
-      for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
-        data.push(this.sensor_type[i]);
-        nextIndex++;
+      for(var property in info){
+        if(info.hasOwnProperty(property)){
+          for(let i = 0; i < this.sensor_type.length; i++){
+            if(this.sensor_type[i][property] === info[property]){
+              data.push(this.sensor_type[i]);
+            }
+            nextIndex++;
+          }
+        }
+      }
+      if(nextIndex >= this.sensor_type.length ){
+        nextIndex = -1;
       }
     }
-    if(nextIndex >= this.sensor_type.length ){
-      nextIndex = -1;
-    }
+    
     data.sort();
     return {"nextIndex":nextIndex,data};
   }
