@@ -165,15 +165,35 @@ class Sensors {
     const searchSpecs = validate('findSensors', info);
     //@TODO
     var data = [];
-    var sensorTypeData={};
     var nextIndex = searchSpecs.index;
-    if(searchSpecs.doDetail){
+    if(Object.keys(info).length === 0){
+      for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+            data.push(this.sensor[i]);
+            nextIndex++;
+          }
+      if(nextIndex >= this.sensor.length ){
+        nextIndex = -1;
+      }
+    }
+    else{
+      for(var property in info){
+        if(info.hasOwnProperty(property)){
+          for(let i = searchSpecs.index; i < this.sensor.length; i++){
+            if(searchSpecs.count){
+              if(this.sensor[i][property] === info[property]){
+                data.push(this.sensor[i]);
+                searchSpecs.count--;
+              }
+            }
+            nextIndex++;
+          }
+        }
+      }
+      if(nextIndex >= this.sensor.length ){
+        nextIndex = -1;
+      } 
+    }
 
-    }
-    for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
-      data.push(this.sensor[i]);
-      nextIndex++;
-    }
     data.sort();
     return {"nextIndex":nextIndex,data};
   }
