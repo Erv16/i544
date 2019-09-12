@@ -166,7 +166,32 @@ class Sensors {
     //@TODO
     var data = [];
     var nextIndex = searchSpecs.index;
-    if(Object.keys(info).length === 0){
+    var tempIndex = searchSpecs.index;
+    if(info.doDetail){
+
+      if(((Object.keys(info).length === 1 ) && info.doDetail) || 
+      ((Object.keys(info).length === 2 ) && info.doDetail && (info.count || info.index)) ||
+      ((Object.keys(info).length === 3) && info.doDetail && info.count && info.index)){
+        for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+          data.push(this.sensor[i]);
+          }
+          nextIndex++;
+        }
+        for(let j = 0; j < data.length; j++){
+          for(let k = 0; k < this.sensor_type.length; k++){
+            if(data[j].model === this.sensor_type[k].id){
+              data[j]["sensorType"] = this.sensor_type[j];
+            }
+          }
+        }
+      if(nextIndex >= this.sensor.length ){
+        nextIndex = -1;
+      }
+      return {data};
+      }
+      
+     
+    if(Object.keys(info).length === 0 || ((Object.keys(info).length === 1) && (info.count || info.index)) || ((Object.keys(info).length === 2) && info.count && info.index)){
       for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
             data.push(this.sensor[i]);
             nextIndex++;
@@ -182,11 +207,15 @@ class Sensors {
             if(searchSpecs.count){
               if(this.sensor[i][property] === info[property]){
                 data.push(this.sensor[i]);
+                nextIndex = tempIndex++;
                 searchSpecs.count--;
               }
             }
-            nextIndex++;
+            tempIndex++;
           }
+        }
+        else{
+          throw [ `No match found!` ];
         }
       }
       if(nextIndex >= this.sensor.length ){
