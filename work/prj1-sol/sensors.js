@@ -67,9 +67,24 @@ class Sensors {
     const sensorData = validate('addSensorData', info);
     //@TODO
     var check = false;
+    let data = info;
     for(let i = 0; i < this.sensor.length; i++){
       if(info.sensorId === this.sensor[i].id){
-        this.sensor_data.push(info);
+        
+        var sensType = validSensorType(this.sensor[i], this.sensor_type);
+        if(parseInt(data.value,10) <= parseInt(sensType.limits.max,10) && parseInt(data.value,10) >= parseInt(sensType.limits.min,10)){
+          
+          if(parseInt(data.value,10) >= parseInt(this.sensor[i].expected.min,10) && parseInt(data.value,10) <= parseInt(this.sensor[i].expected.max,10)){
+            
+            data["status"] = 'ok';
+          }
+          else{
+            data["status"] = 'outOfRange';
+          }
+        }
+        else{data["status"] = 'error';
+        }
+        this.sensor_data.push(data);
         check = true;
       }
     }
@@ -77,8 +92,6 @@ class Sensors {
     if(!check){
       throw [ `${info.sensorId} does not exist, data could not be recorded` ];
     }
-    
-    console.log(this.sensor_data);
   }
 
   /** Subject to validation of search-parameters in info as per
@@ -167,7 +180,7 @@ class Sensors {
     var data = [];
     var nextIndex = searchSpecs.index;
     var tempIndex = searchSpecs.index;
-    if(info.doDetail){
+    if(info.hasOwnProperty('doDetail') && info.doDetail){
 
       if(((Object.keys(info).length === 1 ) && info.doDetail) || 
       ((Object.keys(info).length === 2 ) && info.doDetail && (info.count || info.index)) ||
@@ -187,11 +200,21 @@ class Sensors {
       if(nextIndex >= this.sensor.length ){
         nextIndex = -1;
       }
+      data.sort();
       return {data};
       }
+      else{
+        for(let a = 0; a < this.sensor.length; a++){
+          if(this.sensor[a].hasOwnProperty('sensorType')){
+            delete this.sensor[a].sensorType;
+          }
+        }
+      }
+  
+    if(Object.keys(info).length === 0 
+    || ((Object.keys(info).length === 1) && (info.count || info.index)) 
+    || ((Object.keys(info).length === 2) && info.count && info.index)){
       
-     
-    if(Object.keys(info).length === 0 || ((Object.keys(info).length === 1) && (info.count || info.index)) || ((Object.keys(info).length === 2) && info.count && info.index)){
       for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
             data.push(this.sensor[i]);
             nextIndex++;
@@ -265,15 +288,62 @@ class Sensors {
   async findSensorData(info) {
     const searchSpecs = validate('findSensorData', info);
     //@TODO
-    return {};
-  }
-  
-  
+    /**
+     * A check to see if the particular sensor with provided
+     * Id exists
+     */
+    var data = [];
+    if(info.statuses){
+      var splitStatus = info.statuses.split('|');
+    }
+    
+    //console.log(splitStatus);
+    //console.log(this.sensor_data);
+    if(validSensor(info, this.sensor)){
+      for(var property in info){
+        if(property === 'sensorId'){
+          data = this.sensor_data.filter(element => element.sensorId === info.sensorId);
+        }
+        else if(property === 'statuses'){
+          data = data.filter(statElem => statElem.status === splitStatus[0] || statElem.status  === splitStatus[1]);
+        }
+        else if(property === 'timestamp'){
+          data = data.filter(timeElem => timeElem.timestamp <= info.timestamp)
+        }
+      }
+    }
+    else{
+      throw [ `unknown sensor id "${info.sensorId}"` ];
+    }
+    //data.sort((a,b) => (a.timestamp < b.timestamp)? 1 : -1);
+    data = data.slice(0,searchSpecs.count);
+    return { data };
+  } 
 }
 
 module.exports = Sensors;
 
 //@TODO add auxiliary functions as necessary
+
+function validSensorType(element, sensTypeArr){
+  for(let i = 0; i < sensTypeArr.length; i++){
+    if(element.model === sensTypeArr[i].id){
+      return sensTypeArr[i];
+    }
+  }
+}
+
+function validSensor(info, sensorArr){
+  for(let i = 0; i < sensorArr.length; i++){
+    if(info.sensorId === sensorArr[i].id){
+      return true;
+    }
+    else{
+      continue;  
+    }
+  }
+  return false;
+}
 
 const DEFAULT_COUNT = 5;    
 
