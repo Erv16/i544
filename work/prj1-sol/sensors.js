@@ -121,7 +121,8 @@ class Sensors {
     var data = [];
     var nextIndex = searchSpecs.index;
     this.sensor_type.sort((a,b) => (a.id > b.id) ? 1 : -1);
-    if(((Object.keys(info).length === 1 ) && (info.count || info.index) || 
+    if(validSensorType(info, this.sensor_type)){
+      if(((Object.keys(info).length === 1 ) && (info.count || info.index) || 
       ((Object.keys(info).length === 2 ) && info.count && info.index))){
       for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
             data.push(this.sensor_type[i]);
@@ -148,6 +149,10 @@ class Sensors {
     }
     
     return {"nextIndex":nextIndex,data};
+    }
+    else{
+      throw [ `cannot find sensor-type for ${info.id}` ];
+    }   
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -182,72 +187,78 @@ class Sensors {
     var nextIndex = searchSpecs.index;
     var tempIndex = searchSpecs.index;
     this.sensor.sort((a,b) => a.id > b.id ? 1 : -1);
-    if(info.hasOwnProperty('doDetail') && info.doDetail){
+    if(validSensor(info, this.sensor)){
+      if(info.hasOwnProperty('doDetail') && info.doDetail){
 
-      if(((Object.keys(info).length === 1 ) && info.doDetail) || 
-      ((Object.keys(info).length === 2 ) && info.doDetail && (info.count || info.index)) ||
-      ((Object.keys(info).length === 3) && info.doDetail && info.count && info.index)){
-        for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
-          data.push(this.sensor[i]);
-          }
-          nextIndex++;
-        }
-        for(let j = 0; j < data.length; j++){
-          for(let k = 0; k < this.sensor_type.length; k++){
-            if(data[j].model === this.sensor_type[k].id){
-              data[j]["sensorType"] = this.sensor_type[j];
-            }
-          }
-        }
-      if(nextIndex >= this.sensor.length ){
-        nextIndex = -1;
-      }
-      return {data};
-      }
-      else{
-        for(let a = 0; a < this.sensor.length; a++){
-          if(this.sensor[a].hasOwnProperty('sensorType')){
-            delete this.sensor[a].sensorType;
-          }
-        }
-      }
-  
-    if(Object.keys(info).length === 0 
-    || ((Object.keys(info).length === 1) && (info.count || info.index)) 
-    || ((Object.keys(info).length === 2) && info.count && info.index)){
-      
-      for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+        if(((Object.keys(info).length === 1 ) && info.doDetail) || 
+        ((Object.keys(info).length === 2 ) && info.doDetail && (info.count || info.index)) ||
+        ((Object.keys(info).length === 3) && info.doDetail && info.count && info.index)){
+          for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
             data.push(this.sensor[i]);
+            }
             nextIndex++;
           }
-      if(nextIndex >= this.sensor.length ){
-        nextIndex = -1;
-      }
-    }
-    else{
-      for(var property in info){
-        if(info.hasOwnProperty(property)){
-          for(let i = searchSpecs.index; i < this.sensor.length; i++){
-            if(searchSpecs.count){
-              if(this.sensor[i][property] === info[property]){
-                data.push(this.sensor[i]);
-                nextIndex = tempIndex++;
-                searchSpecs.count--;
+          for(let j = 0; j < data.length; j++){
+            for(let k = 0; k < this.sensor_type.length; k++){
+              if(data[j].model === this.sensor_type[k].id){
+                data[j]["sensorType"] = this.sensor_type[j];
               }
             }
-            tempIndex++;
           }
+        if(nextIndex >= this.sensor.length ){
+          nextIndex = -1;
+        }
+        return {data};
         }
         else{
-          throw [ `No match found!` ];
+          for(let a = 0; a < this.sensor.length; a++){
+            if(this.sensor[a].hasOwnProperty('sensorType')){
+              delete this.sensor[a].sensorType;
+            }
+          }
+        }
+    
+      if(Object.keys(info).length === 0 
+      || ((Object.keys(info).length === 1) && (info.count || info.index)) 
+      || ((Object.keys(info).length === 2) && info.count && info.index)){
+        
+        for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+              data.push(this.sensor[i]);
+              nextIndex++;
+            }
+        if(nextIndex >= this.sensor.length ){
+          nextIndex = -1;
         }
       }
-      if(nextIndex >= this.sensor.length ){
-        nextIndex = -1;
-      } 
+      else{
+        for(var property in info){
+          if(info.hasOwnProperty(property)){
+            for(let i = searchSpecs.index; i < this.sensor.length; i++){
+              if(searchSpecs.count){
+                if(this.sensor[i][property] === info[property]){
+                  data.push(this.sensor[i]);
+                  nextIndex = tempIndex++;
+                  searchSpecs.count--;
+                }
+              }
+              tempIndex++;
+            }
+          }
+          else{
+            throw [ `No match found!` ];
+          }
+        }
+        if(nextIndex >= this.sensor.length ){
+          nextIndex = -1;
+        } 
+      }
+  
+      return {"nextIndex":nextIndex,data};
     }
-
-    return {"nextIndex":nextIndex,data};
+    else{
+      throw [ `cannot find sensor for id ${info.id}` ];
+    }
+    
   }
   
   /** Subject to validation of search-parameters in info as per
