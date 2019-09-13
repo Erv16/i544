@@ -296,9 +296,6 @@ class Sensors {
     if(info.statuses){
       var splitStatus = info.statuses.split('|');
     }
-    
-    //console.log(splitStatus);
-    //console.log(this.sensor_data);
     if(validSensor(info, this.sensor)){
       for(var property in info){
         if(property === 'sensorId'){
@@ -315,8 +312,13 @@ class Sensors {
     else{
       throw [ `unknown sensor id "${info.sensorId}"` ];
     }
-    //data.sort((a,b) => (a.timestamp < b.timestamp)? 1 : -1);
     data = data.slice(0,searchSpecs.count);
+
+    if(info.doDetail){
+      var sensor = getSensorProperty(info,this.sensor);
+      var sensorType = getSensorTypeProperty(info, this.sensor, this.sensor_type);
+      return { data, sensorType, sensor};
+    }
     return { data };
   } 
 }
@@ -331,6 +333,16 @@ function validSensorType(element, sensTypeArr){
       return sensTypeArr[i];
     }
   }
+}
+
+function getSensorProperty(elem, sensorInfo){
+
+  return sensorInfo.find(item => elem.sensorId === item.id);
+}
+
+function getSensorTypeProperty(elem, sensorInfo, sensorTypeInfo){
+  let temp = sensorInfo.find(item => elem.sensorId === item.id);
+  return sensorTypeInfo.find(val => temp.model === val.id);
 }
 
 function validSensor(info, sensorArr){
