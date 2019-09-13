@@ -120,7 +120,9 @@ class Sensors {
     //@TODO
     var data = [];
     var nextIndex = searchSpecs.index;
-    if(Object.keys(info).length === 0){
+    this.sensor_type.sort((a,b) => (a.id > b.id) ? 1 : -1);
+    if(((Object.keys(info).length === 1 ) && (info.count || info.index) || 
+      ((Object.keys(info).length === 2 ) && info.count && info.index))){
       for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
             data.push(this.sensor_type[i]);
             nextIndex++;
@@ -145,7 +147,6 @@ class Sensors {
       }
     }
     
-    data.sort();
     return {"nextIndex":nextIndex,data};
   }
   
@@ -180,6 +181,7 @@ class Sensors {
     var data = [];
     var nextIndex = searchSpecs.index;
     var tempIndex = searchSpecs.index;
+    this.sensor.sort((a,b) => a.id > b.id ? 1 : -1);
     if(info.hasOwnProperty('doDetail') && info.doDetail){
 
       if(((Object.keys(info).length === 1 ) && info.doDetail) || 
@@ -200,7 +202,6 @@ class Sensors {
       if(nextIndex >= this.sensor.length ){
         nextIndex = -1;
       }
-      data.sort();
       return {data};
       }
       else{
@@ -246,7 +247,6 @@ class Sensors {
       } 
     }
 
-    data.sort();
     return {"nextIndex":nextIndex,data};
   }
   
