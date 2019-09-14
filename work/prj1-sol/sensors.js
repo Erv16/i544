@@ -19,8 +19,9 @@ class Sensors {
   /** Clear out all data from this object. */
   async clear() {
     //@TODO
+    this.sensor_type= [];
+    this.sesnor = [];
     this.sensor_data=[];
-    console.log(this.sensor_data);
   }
 
   /** Subject to field validation as per FN_INFOS.addSensorType,
@@ -71,7 +72,7 @@ class Sensors {
     for(let i = 0; i < this.sensor.length; i++){
       if(info.sensorId === this.sensor[i].id){
         
-        var sensType = validSensorType(this.sensor[i], this.sensor_type);
+        var sensType = getSensorTypeProperty(this.sensor[i], this.sensor_type);
         if(parseInt(data.value,10) <= parseInt(sensType.limits.max,10) && parseInt(data.value,10) >= parseInt(sensType.limits.min,10)){
           
           if(parseInt(data.value,10) >= parseInt(this.sensor[i].expected.min,10) && parseInt(data.value,10) <= parseInt(this.sensor[i].expected.max,10)){
@@ -121,38 +122,35 @@ class Sensors {
     var data = [];
     var nextIndex = searchSpecs.index;
     this.sensor_type.sort((a,b) => (a.id > b.id) ? 1 : -1);
-    if(validSensorType(info, this.sensor_type)){
-      if(((Object.keys(info).length === 1 ) && (info.count || info.index) || 
-      ((Object.keys(info).length === 2 ) && info.count && info.index))){
+    if(searchSpecs.id){
+      if(!checkSensorTypeExists(searchSpecs,this.sensor_type)){
+        throw [ `cannot find sensor-type for id "${searchSpecs.id}"` ];  
+      }
+    }
+    if(Object.keys(searchSpecs).length === 3 && searchSpecs.id === null){
       for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
-            data.push(this.sensor_type[i]);
-            nextIndex++;
-          }
+        data.push(this.sensor_type[i]);
+        nextIndex++;
+      }
       if(nextIndex >= this.sensor_type.length ){
         nextIndex = -1;
       }
+      return {"nextIndex":nextIndex,data}; 
     }
-    else{
-      for(var property in info){
-        if(info.hasOwnProperty(property)){
-          for(let i = 0; i < this.sensor_type.length; i++){
-            if(this.sensor_type[i][property] === info[property]){
-              data.push(this.sensor_type[i]);
-            }
-            nextIndex++;
+      for(var property in searchSpecs){
+        for(let i = 0; i < this.sensor_type.length; i++){
+          if(this.sensor_type[i][property] === searchSpecs[property]){
+           data.push(this.sensor_type[i]);
           }
+          nextIndex++;
         }
       }
+
       if(nextIndex >= this.sensor_type.length ){
         nextIndex = -1;
       }
-    }
-    
-    return {"nextIndex":nextIndex,data};
-    }
-    else{
-      throw [ `cannot find sensor-type for ${info.id}` ];
-    }   
+      return {"nextIndex":nextIndex,data}; 
+
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -187,78 +185,52 @@ class Sensors {
     var nextIndex = searchSpecs.index;
     var tempIndex = searchSpecs.index;
     this.sensor.sort((a,b) => a.id > b.id ? 1 : -1);
-    if(validSensor(info, this.sensor)){
-      if(info.hasOwnProperty('doDetail') && info.doDetail){
-
-        if(((Object.keys(info).length === 1 ) && info.doDetail) || 
-        ((Object.keys(info).length === 2 ) && info.doDetail && (info.count || info.index)) ||
-        ((Object.keys(info).length === 3) && info.doDetail && info.count && info.index)){
-          for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
-            data.push(this.sensor[i]);
-            }
-            nextIndex++;
-          }
-          for(let j = 0; j < data.length; j++){
-            for(let k = 0; k < this.sensor_type.length; k++){
-              if(data[j].model === this.sensor_type[k].id){
-                data[j]["sensorType"] = this.sensor_type[j];
-              }
-            }
-          }
-        if(nextIndex >= this.sensor.length ){
-          nextIndex = -1;
-        }
-        return {data};
-        }
-        else{
-          for(let a = 0; a < this.sensor.length; a++){
-            if(this.sensor[a].hasOwnProperty('sensorType')){
-              delete this.sensor[a].sensorType;
-            }
-          }
-        }
+    if(searchSpecs.id){
+      if(!checkSensorExists(searchSpecs,this.sensor)){
+        throw [ `cannot find sensor for id "${searchSpecs.id}"` ];
+      }
+    }
     
-      if(Object.keys(info).length === 0 
-      || ((Object.keys(info).length === 1) && (info.count || info.index)) 
-      || ((Object.keys(info).length === 2) && info.count && info.index)){
-        
-        for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+    if(Object.keys(searchSpecs).length === 4 && searchSpecs.id === null){
+      for(let i = searchSpecs.index; i < ((+searchSpecs.index) + (+searchSpecs.count)); i++){
+        data.push(this.sensor[i]);
+        nextIndex++;
+      }
+      if(searchSpecs.doDetail){
+        data.forEach(elem => elem.sensorType = getSensorTypeProperty(elem,this.sensor_type));
+      }
+      else if(!searchSpecs.doDetail){
+        data.forEach(elem => delete elem.sensorType);
+      }
+      return {"nextIndex":(nextIndex >= this.sensor.length?-1:nextIndex),data}; 
+    }
+
+    let c = searchSpecs.count;
+    for(var property in searchSpecs){
+      if(searchSpecs.hasOwnProperty(property)){
+        for(let i = searchSpecs.index; i < this.sensor.length; i++){
+          if(c){
+            if(this.sensor[i][property] === searchSpecs[property]){
               data.push(this.sensor[i]);
-              nextIndex++;
+              nextIndex = tempIndex++;
+              c--;
             }
-        if(nextIndex >= this.sensor.length ){
-          nextIndex = -1;
+          }
+          tempIndex++;
         }
       }
       else{
-        for(var property in info){
-          if(info.hasOwnProperty(property)){
-            for(let i = searchSpecs.index; i < this.sensor.length; i++){
-              if(searchSpecs.count){
-                if(this.sensor[i][property] === info[property]){
-                  data.push(this.sensor[i]);
-                  nextIndex = tempIndex++;
-                  searchSpecs.count--;
-                }
-              }
-              tempIndex++;
-            }
-          }
-          else{
-            throw [ `No match found!` ];
-          }
-        }
-        if(nextIndex >= this.sensor.length ){
-          nextIndex = -1;
-        } 
+        throw [ `No match found!` ];
       }
-  
-      return {"nextIndex":nextIndex,data};
     }
-    else{
-      throw [ `cannot find sensor for id ${info.id}` ];
+    if(searchSpecs.doDetail){
+      data.forEach(elem => elem.sensorType = getSensorTypeProperty(elem,this.sensor_type));
     }
-    
+    else if(!searchSpecs.doDetail){
+      data.forEach(elem => delete elem.sensorType);
+    }
+
+  return {"nextIndex":(nextIndex >= this.sensor.length?-1:nextIndex),data};
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -299,73 +271,55 @@ class Sensors {
   async findSensorData(info) {
     const searchSpecs = validate('findSensorData', info);
     //@TODO
-    /**
-     * A check to see if the particular sensor with provided
-     * Id exists
-     */
     var data = [];
-    if(info.statuses){
-      var splitStatus = info.statuses.split('|');
-    }
-    if(validSensor(info, this.sensor)){
-      for(var property in info){
+    if(!validSensor(searchSpecs, this.sensor)){
+        throw [ `unknown sensor id "${info.sensorId}"` ];
+      }
+
+      for(var property in searchSpecs){
         if(property === 'sensorId'){
-          data = this.sensor_data.filter(element => element.sensorId === info.sensorId);
-        }
+          data = this.sensor_data.filter(element => element.sensorId === searchSpecs.sensorId);
+         }
         else if(property === 'statuses'){
-          data = data.filter(statElem => statElem.status === splitStatus[0] || statElem.status  === splitStatus[1]);
+          data = data.filter(statElem => searchSpecs.statuses.has(statElem.status));
         }
         else if(property === 'timestamp'){
-          data = data.filter(timeElem => timeElem.timestamp <= info.timestamp)
+          data = data.filter(timeElem => timeElem.timestamp <= searchSpecs.timestamp)
         }
       }
-    }
-    else{
-      throw [ `unknown sensor id "${info.sensorId}"` ];
-    }
-    data = data.slice(0,searchSpecs.count);
-
-    if(info.doDetail){
-      var sensor = getSensorProperty(info,this.sensor);
-      var sensorType = getSensorTypeProperty(info, this.sensor, this.sensor_type);
-      return { data, sensorType, sensor};
-    }
-    return { data };
-  } 
+      if(searchSpecs.doDetail){
+        var sensor = getSensorProperty(searchSpecs,this.sensor);
+        var sensorType = getSensorTypeProperty(sensor, this.sensor_type);
+        data = data.slice(0,searchSpecs.count);
+        return { data, sensorType, sensor};
+      }
+      data = data.slice(0,searchSpecs.count);
+      return { data };    
+  }
 }
 
 module.exports = Sensors;
 
 //@TODO add auxiliary functions as necessary
 
-function validSensorType(element, sensTypeArr){
-  for(let i = 0; i < sensTypeArr.length; i++){
-    if(element.model === sensTypeArr[i].id){
-      return sensTypeArr[i];
-    }
-  }
+function checkSensorTypeExists(info, sensorTypeArr){
+  return sensorTypeArr.find(elem => elem.id === info.id);
+}
+
+function checkSensorExists(info, sensorArr){
+  return sensorArr.find(elem => elem.id === info.id);
 }
 
 function getSensorProperty(elem, sensorInfo){
-
   return sensorInfo.find(item => elem.sensorId === item.id);
 }
 
-function getSensorTypeProperty(elem, sensorInfo, sensorTypeInfo){
-  let temp = sensorInfo.find(item => elem.sensorId === item.id);
-  return sensorTypeInfo.find(val => temp.model === val.id);
+function getSensorTypeProperty(elem, sensorTypeInfo){
+  return sensorTypeInfo.find(val => elem.model === val.id);
 }
 
 function validSensor(info, sensorArr){
-  for(let i = 0; i < sensorArr.length; i++){
-    if(info.sensorId === sensorArr[i].id){
-      return true;
-    }
-    else{
-      continue;  
-    }
-  }
-  return false;
+  return sensorArr.find(elem => elem.id === info.sensorId);
 }
 
 const DEFAULT_COUNT = 5;    
