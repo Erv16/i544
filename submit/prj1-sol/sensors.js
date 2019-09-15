@@ -210,7 +210,7 @@ class Sensors {
       if(searchSpecs.hasOwnProperty(property)){
         for(let i = searchSpecs.index; i < this.sensor.length; i++){
           if(c){
-            if(this.sensor[i][property] === searchSpecs[property]){
+           if(this.sensor[i][property] === searchSpecs[property]){
               data.push(this.sensor[i]);
               nextIndex = tempIndex++;
               c--;
