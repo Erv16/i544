@@ -8,6 +8,10 @@ const mongo = require('mongodb').MongoClient;
 
 class Sensors {
 
+  constructor(client,db){
+    this.client = client;
+    this.db = db;
+  }
 
   /** Return a new instance of this class with database as
    *  per mongoDbUrl.  Note that mongoDbUrl is expected to
@@ -15,7 +19,21 @@ class Sensors {
    */
   static async newSensors(mongoDbUrl) {
     //@TODO
-    return new Sensors();    
+    let client;
+    let db;
+    if(/([a-z:]+)\/\/([a-z:]+[0-9]+)\/([a-z]+)/.test(mongoDbUrl)){
+      let mongo_url = mongoDbUrl.slice(0,mongoDbUrl.lastIndexOf('/'));
+      let db_name = mongoDbUrl.slice(mongoDbUrl.lastIndexOf('/')+1,mongoDbUrl.length);
+      // console.log(mongo_url);
+      // console.log(db_name);
+      client = await mongo.connect(mongo_url);
+      db = client.db(db_name);
+    }
+    else{
+      const err = `${mongoDbUrl} is not a valid url. Please provide a valid url to proceed`;
+      throw [ new AppError('URL',err) ];
+    }    
+    return new Sensors(client, db);    
   }
 
   /** Release all resources held by this Sensors instance.
@@ -23,11 +41,20 @@ class Sensors {
    */
   async close() {
     //@TODO
+    await this.client.close();
   }
 
   /** Clear database */
   async clear() {
     //@TODO
+    this.db.CollectionName.remove().exec(function(error){
+      if(error){
+        console.log('Error');
+      }
+      else{
+        console.log('Deleted');
+      }
+    });
   }
 
   /** Subject to field validation as per validate('addSensorType',
