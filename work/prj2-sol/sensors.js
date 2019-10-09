@@ -24,9 +24,9 @@ class Sensors {
     if(/([a-z:]+)\/\/([a-z:]+[0-9]+)\/([a-z]+)/.test(mongoDbUrl)){
       let mongo_url = mongoDbUrl.slice(0,mongoDbUrl.lastIndexOf('/'));
       let db_name = mongoDbUrl.slice(mongoDbUrl.lastIndexOf('/')+1,mongoDbUrl.length);
-      // console.log(mongo_url);
+      //console.log(mongo_url);
       // console.log(db_name);
-      client = await mongo.connect(mongo_url);
+      client = await mongo.connect(mongo_url,MONGO_OPTIONS);
       db = client.db(db_name);
     }
     else{
@@ -47,14 +47,7 @@ class Sensors {
   /** Clear database */
   async clear() {
     //@TODO
-    this.db.CollectionName.remove().exec(function(error){
-      if(error){
-        console.log('Error');
-      }
-      else{
-        console.log('Deleted');
-      }
-    });
+    this.db.dropDatabase();
   }
 
   /** Subject to field validation as per validate('addSensorType',
@@ -63,9 +56,25 @@ class Sensors {
    *
    *  All user errors must be thrown as an array of AppError's.
    */
+
+   /**
+    * Add in sensorType validation that checks if a sensorType exists
+    * before inserting a new value else it should update an existing 
+    * value
+    */
   async addSensorType(info) {
     const sensorType = validate('addSensorType', info);
     //@TODO
+    let dbSensorType = await toSensorType(sensorType);
+    const dbSensorTypeTable = this.db.collection(SENSORTYPES_TABLE);
+    try{
+      let ret = await dbSensorTypeTable.insertOne(dbSensorType);
+      assert(ret.insertedId = dbSensorType.id);
+    }
+    catch(err){
+      throw err;
+    }
+    //console.log(sensorType);
   }
   
   /** Subject to field validation as per validate('addSensor', info)
@@ -78,6 +87,20 @@ class Sensors {
   async addSensor(info) {
     const sensor = validate('addSensor', info);
     //@TODO
+    if(this.db.collection(SENSORTYPES_TABLE).find(info.model)){
+      let dbSensor = await toSensor(sensor);
+      const dbSensorTable = this.db.collection(SENSOR_TABLE);
+      try{
+        let ret = await dbSensorTable.insertOne(dbSensor);
+        assert(ret.insertedId === dbSensor.id);
+      }
+      catch(err){
+        throw err;
+      }
+    }
+    else{
+      throw 'Cannot insert sensor as type not found';
+    }
   }
 
   /** Subject to field validation as per validate('addSensorData',
@@ -91,6 +114,19 @@ class Sensors {
   async addSensorData(info) {
     const sensorData = validate('addSensorData', info);
     //@TODO
+    if(this.db.collection(SENSOR_TABLE).find(info.sensorId)){
+      let dbSensorData = await toSensorData(sensorData);
+      const dbSensorDataTable = this.db.collection(SENSOR_DATA_TABLE);
+      try{
+        let ret = await dbSensorDataTable.insertOne(dbSensorData);
+      }
+      catch(err){
+        throw err;
+      }
+    }
+    else{
+      console.log('not found');
+    }
   }
 
   /** Subject to validation of search-parameters in info as per
@@ -194,10 +230,49 @@ class Sensors {
     const searchSpecs = validate('findSensorData', info);
     return { data: [], };
   }
-
-  
-  
 } //class Sensors
+
+const SENSORTYPES_TABLE = 'sensorTypes';
+const SENSOR_TABLE = 'sensor';
+const SENSOR_DATA_TABLE = 'sensorData';
+
+async function toSensor(sensorInfo){
+  try{
+    let sensor = await _toDb(sensorInfo);
+    return sensor;
+  }
+  catch(err){
+    console.log('failed in sensor',err);
+  }
+}
+
+async function toSensorType(sensorTypesInfo){
+  try{
+    let sensorType = await _toDb(sensorTypesInfo);
+    return sensorType;
+  }
+  catch(err){
+    console.log('failed',err);
+  }
+}
+
+async function toSensorData(sensorDataInfo){
+  try{
+    let sensorData = await _toDb(sensorDataInfo);
+    return sensorData;
+  }
+  catch(err){
+    console.log('failed in sensorData',err);
+  }
+}
+
+async function _toDb(data){
+  let dbData = Object.assign({},data);
+  if(dbData.id){
+    dbData._id = dbData.id;
+  }
+  return dbData;
+}
 
 module.exports = Sensors.newSensors;
 
