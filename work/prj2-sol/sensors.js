@@ -273,6 +273,7 @@ class Sensors {
     let index = searchSpecs['_index'];
     let count = searchSpecs['_count'];
     let doDetail = searchSpecs['_doDetail'];
+    let statuses = searchSpecs['statuses'];
     if(!(await this.db.collection(SENSOR_DATA_TABLE).findOne({sensorId:searchSpecs.sensorId}))){
       const err = `unknown sensor id ${searchSpecs.sensorId}`;
       throw [ new AppError('X_ID', err) ];
@@ -348,7 +349,7 @@ async function _toDb(data){
 async function _reformatSensorTypeObject(searchSpecs){
   let obj = searchSpecs;
   for(let val in obj){
-    if(obj[val] === null || obj[val] === undefined || val === '_index' || val === '_count' || val === '_doDetail'){
+    if(obj[val] === null || obj[val] === undefined || val === '_index' || val === '_count' || val === '_doDetail' || 'statuses'){
       delete obj[val];
     }
   }
