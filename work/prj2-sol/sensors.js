@@ -57,6 +57,10 @@ class Sensors {
    *  All user errors must be thrown as an array of AppError's.
    */
 
+   /**Add replaceOne() implementation
+    * 
+    * 
+    */
   async addSensorType(info) {
     const sensorType = validate('addSensorType', info);
     //@TODO
@@ -93,7 +97,7 @@ class Sensors {
       }
     }
     else{
-      const err = `Cannot insert sensor ${sensor.model} as it is not a valid Sensor Type`
+      const err = `Cannot insert sensor ${sensor.model} as it does not have an existing Sensor Type`
       throw [ new AppError('TYPE',err) ];
     }
   }
@@ -124,7 +128,7 @@ class Sensors {
       }
     }  
     else{
-      const err = `Cannot insert sensor data ${sensorData.sensorId} as it is not a valid Sensor`
+      const err = `Cannot insert sensor data ${sensorData.sensorId} as it does not have an existing Sensor`
       throw [ new AppError('TYPE',err) ];
     }
     
@@ -300,8 +304,10 @@ class Sensors {
     let sensorType = await this.db.collection(SENSORTYPES_TABLE).findOne({_id:sensor.model});
     delete sensor['_id'];
     delete sensorType['_id'];
+    data.forEach(elem => delete elem['sensorId']);
     return {data, sensorType, sensor}
   }
+    data.forEach(elem => delete elem['sensorId']);
     return { data };
   }
 } //class Sensors
