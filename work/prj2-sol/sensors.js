@@ -66,12 +66,18 @@ class Sensors {
     //@TODO
     let dbSensorType = await _toSensorType(sensorType);
     const dbSensorTypeTable = this.db.collection(SENSORTYPES_TABLE);
-    try{
-      let ret = await dbSensorTypeTable.insertOne(dbSensorType);
-      assert(ret.insertedId = dbSensorType.id);
+    let existingObject = await this.db.collection(SENSORTYPES_TABLE).findOne({_id:dbSensorType.id});
+    if(existingObject){
+      let ret = await this.db.collection(SENSORTYPES_TABLE).replaceOne({_id:dbSensorType.id},dbSensorType,{upsert:true});
     }
-    catch(err){
-      throw [ new AppError('DATABASE',err) ];
+    else{
+      try{
+        let ret = await dbSensorTypeTable.insertOne(dbSensorType);
+        //assert(ret.insertedId = dbSensorType.id);
+      }
+      catch(err){
+        throw [ new AppError('DATABASE',err) ];
+      }
     }
   }
   
@@ -85,15 +91,22 @@ class Sensors {
   async addSensor(info) {
     const sensor = validate('addSensor', info);
     //@TODO
-    if(this.db.collection(SENSORTYPES_TABLE).find({_id:sensor.model})){
+    let check = await this.db.collection(SENSORTYPES_TABLE).findOne({_id:sensor.model});
+    if(check){
       let dbSensor = await _toSensor(sensor);
       const dbSensorTable = this.db.collection(SENSOR_TABLE);
-      try{
-        let ret = await dbSensorTable.insertOne(dbSensor);
-        assert(ret.insertedId === dbSensor.id);
+      let existingObject = await this.db.collection(SENSOR_TABLE).findOne({_id:dbSensor.id});
+      if(existingObject){
+        let ret = await this.db.collection(SENSOR_TABLE).replaceOne({_id:dbSensor.id},dbSensor,{upsert:true});
       }
-      catch(err){
-        throw [ new AppError('DATABASE',err) ];
+      else{
+        try{
+          let ret = await dbSensorTable.insertOne(dbSensor);
+          //assert(ret.insertedId === dbSensor.id);
+        }
+        catch(err){
+          throw [ new AppError('DATABASE',err) ];
+        }
       }
     }
     else{
@@ -119,14 +132,19 @@ class Sensors {
       let sensorType = await this.db.collection(SENSORTYPES_TABLE).find({_id:sensor[0].model}).toArray();
       let dbSensorData = await _toSensorData(sensorData,sensor[0],sensorType[0]);
       const dbSensorDataTable = this.db.collection(SENSOR_DATA_TABLE);
-      
-      try{
-        let ret = await dbSensorDataTable.insertOne(dbSensorData);
+      // let existingObject = await this.db.collection(SENSOR_DATA_TABLE).findOne({sensorId:dbSensorData.sensorId});
+      // if(existingObject){
+      //   let ret = await this.db.collection(SENSOR_DATA_TABLE).replaceOne({sensorId:dbSensorData.sensorId},dbSensorData,{upsert:true});
+      // }
+      // else{
+         try{
+          let ret = await dbSensorDataTable.insertOne(dbSensorData);
+        }
+        catch(err){
+          throw [ new AppError('DATABASE',err) ];
+        }
       }
-      catch(err){
-        throw [ new AppError('DATABASE',err) ];
-      }
-    }  
+    //}  
     else{
       const err = `Cannot insert sensor data ${sensorData.sensorId} as it does not have an existing Sensor`
       throw [ new AppError('TYPE',err) ];
@@ -174,7 +192,7 @@ class Sensors {
       delete elem['_id'];
     })
     data = ret;    
-    return {data:data, nextIndex};
+    return {data, nextIndex};
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -283,6 +301,7 @@ class Sensors {
       throw [ new AppError('X_ID', err) ];
     }
     let ret = await this.db.collection(SENSOR_DATA_TABLE).find({sensorId:searchSpecs.sensorId}).sort({"timestamp":-1}).toArray();
+    console.log(ret);
     ret.forEach(elem => {
       delete elem['_id'];
     })
@@ -355,7 +374,7 @@ async function _toDb(data){
 async function _reformatSensorTypeObject(searchSpecs){
   let obj = searchSpecs;
   for(let val in obj){
-    if(obj[val] === null || obj[val] === undefined || val === '_index' || val === '_count' || val === '_doDetail' || 'statuses'){
+    if(obj[val] === null || obj[val] === undefined || val === '_index' || val === '_count' || val === '_doDetail'){
       delete obj[val];
     }
   }
