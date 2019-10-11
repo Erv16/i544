@@ -21,11 +21,9 @@ class Sensors {
     //@TODO
     let client;
     let db;
-    if(/([a-z:]+)\/\/([a-z:]+[0-9]+)\/([a-z]+)/.test(mongoDbUrl)){
+    if(/(mongodb:)\/\/([a-z:]+[0-9]+)\/([a-z]+)/.test(mongoDbUrl)){
       let mongo_url = mongoDbUrl.slice(0,mongoDbUrl.lastIndexOf('/'));
       let db_name = mongoDbUrl.slice(mongoDbUrl.lastIndexOf('/')+1,mongoDbUrl.length);
-      //console.log(mongo_url);
-      // console.log(db_name);
       client = await mongo.connect(mongo_url,MONGO_OPTIONS);
       db = client.db(db_name);
     }
@@ -87,7 +85,7 @@ class Sensors {
   async addSensor(info) {
     const sensor = validate('addSensor', info);
     //@TODO
-    if(this.db.collection(SENSORTYPES_TABLE).find(info.model)){
+    if(this.db.collection(SENSORTYPES_TABLE).find({_id:info.model})){
       let dbSensor = await toSensor(sensor);
       const dbSensorTable = this.db.collection(SENSOR_TABLE);
       try{
@@ -114,18 +112,16 @@ class Sensors {
   async addSensorData(info) {
     const sensorData = validate('addSensorData', info);
     //@TODO
-    if(this.db.collection(SENSOR_TABLE).find(info.sensorId)){
-      let dbSensorData = await toSensorData(sensorData);
-      const dbSensorDataTable = this.db.collection(SENSOR_DATA_TABLE);
-      try{
-        let ret = await dbSensorDataTable.insertOne(dbSensorData);
-      }
-      catch(err){
-        throw err;
-      }
+    let sensor = await this.db.collection(SENSOR_TABLE).find({_id:sensorData.sensorId}).toArray();
+    let sensorType = await this.db.collection(SENSORTYPES_TABLE).find({_id:sensor[0].model}).toArray();
+    let dbSensorData = await toSensorData(sensorData,sensor[0],sensorType[0]);
+    const dbSensorDataTable = this.db.collection(SENSOR_DATA_TABLE);
+    
+    try{
+      let ret = await dbSensorDataTable.insertOne(dbSensorData);
     }
-    else{
-      console.log('not found');
+    catch(err){
+      throw err;
     }
   }
 
@@ -154,7 +150,16 @@ class Sensors {
   async findSensorTypes(info) {
     //@TODO
     const searchSpecs = validate('findSensorTypes', info);
-    return { data: [], nextIndex: -1 };
+    let data = [];
+    let index = searchSpecs['_index'];
+    let count = searchSpecs['_count'];
+    let sensorTypeObj = await reformatSensorTypeObject(searchSpecs);
+    let ret = await this.db.collection(SENSORTYPES_TABLE).find(sensorTypeObj).sort({"_id":1}).skip(index).limit(count).toArray(); 
+    ret.forEach(elem => {
+      delete elem['_id'];
+    })
+    data.push(ret);    
+    return {data};
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -185,7 +190,27 @@ class Sensors {
   async findSensors(info) {
     //@TODO
     const searchSpecs = validate('findSensors', info);
-    return { data: [], nextIndex: -1 };
+    let data = [];
+    let index = searchSpecs['_index'];
+    let count = searchSpecs['_count'];
+    let doDetail = searchSpecs['_doDetail'];
+    let sensorObj = await reformatSensorTypeObject(searchSpecs);
+    let ret = await this.db.collection(SENSOR_TABLE).find(sensorObj).sort({"_id":1}).skip(index).limit(count).toArray(); 
+    ret.forEach(elem => {
+      delete elem['_id'];
+      data.push(elem);
+    })
+    if(doDetail){
+      for(let i = 0; i < data.length; i++){
+        let temp = await this.db.collection(SENSORTYPES_TABLE).findOne({_id:data[i].model});
+          delete temp['_id'];
+          data[i].sensorType = temp;
+      }
+      return {data};
+    }
+    else{
+      return { data:data };
+    }
   }
   
   /** Subject to validation of search-parameters in info as per
@@ -228,7 +253,37 @@ class Sensors {
   async findSensorData(info) {
     //@TODO
     const searchSpecs = validate('findSensorData', info);
-    return { data: [], };
+    let data = [];
+    let index = searchSpecs['_index'];
+    let count = searchSpecs['_count'];
+    let doDetail = searchSpecs['_doDetail'];
+    if(!(await this.db.collection(SENSOR_DATA_TABLE).findOne({sensorId:searchSpecs.sensorId}))){
+      const err = `unknown sensor id ${searchSpecs.sensorId}`;
+      throw [ new AppError('X_ID', err) ];
+    }
+    let ret = await this.db.collection(SENSOR_DATA_TABLE).find({sensorId:searchSpecs.sensorId}).sort({"timestamp":-1}).toArray();
+    ret.forEach(elem => {
+      delete elem['_id'];
+    })
+    
+    for(let property in searchSpecs){
+      if(property === 'timestamp'){
+        ret = ret.filter(timeElem => timeElem.timestamp <= searchSpecs.timestamp);
+      }
+      if(property === 'statuses'){
+        ret = ret.filter(statusElem => searchSpecs.statuses.has(statusElem.status));
+      }
+      
+    }
+    for(let i = 0; i < count; i++){
+      data.push(ret[i]);
+  }
+  if(doDetail){
+    let sensor = await this.db.collection(SENSOR_TABLE).findOne({_id:ret[0].sensorId});
+    let sensorType = await this.db.collection(SENSORTYPES_TABLE).findOne({_id:sensor.model});
+    return {data, sensorType, sensor}
+  }
+    return { data };
   }
 } //class Sensors
 
@@ -256,14 +311,11 @@ async function toSensorType(sensorTypesInfo){
   }
 }
 
-async function toSensorData(sensorDataInfo){
-  try{
-    let sensorData = await _toDb(sensorDataInfo);
-    return sensorData;
-  }
-  catch(err){
-    console.log('failed in sensorData',err);
-  }
+async function toSensorData(sensorDataObj, sensor, sensorType){
+    let dbData = Object.assign({}, sensorDataObj);
+    dbData.status = (!inRange(dbData.value, sensorType.limits) ? 'error' : 
+    (!inRange(dbData.value, sensor.expected) ? 'outOfRange' : 'ok'));
+    return dbData;
 }
 
 async function _toDb(data){
@@ -272,6 +324,16 @@ async function _toDb(data){
     dbData._id = dbData.id;
   }
   return dbData;
+}
+
+async function reformatSensorTypeObject(searchSpecs){
+  let obj = searchSpecs;
+  for(let val in obj){
+    if(obj[val] === null || obj[val] === undefined || val === '_index' || val === '_count' || val === '_doDetail'){
+      delete obj[val];
+    }
+  }
+    return obj;
 }
 
 module.exports = Sensors.newSensors;
@@ -284,5 +346,5 @@ const MONGO_OPTIONS = {
 
 
 function inRange(value, range) {
-  return Number(range.min) <= value && value <= Number(range.max);
+  return Number(range.min) <= Number(value) && Number(value) <= Number(range.max);
 }
