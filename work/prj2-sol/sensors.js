@@ -57,10 +57,6 @@ class Sensors {
    *  All user errors must be thrown as an array of AppError's.
    */
 
-   /**Add replaceOne() implementation
-    * 
-    * 
-    */
   async addSensorType(info) {
     const sensorType = validate('addSensorType', info);
     //@TODO
@@ -73,7 +69,6 @@ class Sensors {
     else{
       try{
         let ret = await dbSensorTypeTable.insertOne(dbSensorType);
-        //assert(ret.insertedId = dbSensorType.id);
       }
       catch(err){
         throw [ new AppError('DATABASE',err) ];
@@ -102,7 +97,6 @@ class Sensors {
       else{
         try{
           let ret = await dbSensorTable.insertOne(dbSensor);
-          //assert(ret.insertedId === dbSensor.id);
         }
         catch(err){
           throw [ new AppError('DATABASE',err) ];
@@ -148,8 +142,7 @@ class Sensors {
     else{
       const err = `Cannot insert sensor data ${sensorData.sensorId} as it does not have an existing Sensor`
       throw [ new AppError('TYPE',err) ];
-    }
-    
+    } 
   }
 
   /** Subject to validation of search-parameters in info as per
