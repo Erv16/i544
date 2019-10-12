@@ -132,11 +132,11 @@ class Sensors {
       let sensorType = await this.db.collection(SENSORTYPES_TABLE).find({_id:sensor[0].model}).toArray();
       let dbSensorData = await _toSensorData(sensorData,sensor[0],sensorType[0]);
       const dbSensorDataTable = this.db.collection(SENSOR_DATA_TABLE);
-      // let existingObject = await this.db.collection(SENSOR_DATA_TABLE).findOne({sensorId:dbSensorData.sensorId});
-      // if(existingObject){
-      //   let ret = await this.db.collection(SENSOR_DATA_TABLE).replaceOne({sensorId:dbSensorData.sensorId},dbSensorData,{upsert:true});
-      // }
-      // else{
+      let existingObject = await this.db.collection(SENSOR_DATA_TABLE).findOne({sensorId:dbSensorData.sensorId,timestamp:dbSensorData.timestamp});
+      if(existingObject){
+        let ret = await this.db.collection(SENSOR_DATA_TABLE).replaceOne({sensorId:dbSensorData.sensorId,timestamp:dbSensorData.timestamp},dbSensorData,{upsert:true});
+      }
+      else{
          try{
           let ret = await dbSensorDataTable.insertOne(dbSensorData);
         }
@@ -144,7 +144,7 @@ class Sensors {
           throw [ new AppError('DATABASE',err) ];
         }
       }
-    //}  
+    }  
     else{
       const err = `Cannot insert sensor data ${sensorData.sensorId} as it does not have an existing Sensor`
       throw [ new AppError('TYPE',err) ];
@@ -301,7 +301,7 @@ class Sensors {
       throw [ new AppError('X_ID', err) ];
     }
     let ret = await this.db.collection(SENSOR_DATA_TABLE).find({sensorId:searchSpecs.sensorId}).sort({"timestamp":-1}).toArray();
-    console.log(ret);
+    
     ret.forEach(elem => {
       delete elem['_id'];
     })
