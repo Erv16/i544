@@ -1,0 +1,9 @@
+Name:		Erwin Palani
+B-Number:	B00755963
+Email:		epalani1@binghamton.edu
+
+This project entails reading sensor related data, storing it into a mongodb database and querying the data based on the parameters. 
+Validated the mongo url using regex.
+Have made use of various mongodb methods such as insertOne(), find(), findOne(), skip(), limit(), etc for querying the database.
+Project has been tested against all the testcases provided in the annotated log and they have been executed successfully.
+
