@@ -24,14 +24,21 @@ function serve(port, sensors) {
 
 module.exports = { serve };
 
-const sensorTypeBase = '/sensor-types';
+
 //@TODO routing function, handlers, utility functions
+
+const sensorTypeBase = '/sensor-types';
+const sensorBase = '/sensors';
+
 function setupRoutes(app){
   app.use(cors());
   app.use(bodyParser.json());
   app.get(sensorTypeBase,findSensorTypeListWs(app)); 
   app.get(`${sensorTypeBase}/:id`, findSensorTypeWs(app));
-  app.post(sensorTypeBase, addSensorTypeWs(app))
+  app.post(sensorTypeBase, addSensorTypeWs(app));
+  app.get(sensorBase, findSensorsListWs(app));
+  app.get(`${sensorBase}/:id`,findSensorsWs(app))
+  app.post(sensorBase, addSensorWs(app));
   app.use(doErrors());
 }
 
@@ -88,6 +95,79 @@ function addSensorTypeWs(app){
     try{
       const obj = req.body;
       const results = await app.locals.model.addSensorType(obj);
+      res.append('Location', requestUrl(req) + '/' + obj.id);
+      res.sendStatus(CREATED);
+    }
+    catch(err){
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function findSensorsListWs(app){
+  return errorWrap(async function(req, res){
+    const q = req.query || {};
+    try{
+      const results = await app.locals.model.findSensors(q);
+      res.json(results);
+    }
+    catch(err){
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function findSensorsWs(app){
+  return errorWrap(async function(req, res){
+    try{
+      const id = req.params.id;
+      const results = await app.locals.model.findSensors({ id : id });
+        res.json(results);
+    }
+    catch(err){  
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function addSensorWs(app){
+  return errorWrap(async function(req, res){
+    try{
+      const obj = req.body;
+      const results = await app.locals.model.addSensor(obj);
       res.append('Location', requestUrl(req) + '/' + obj.id);
       res.sendStatus(CREATED);
     }
