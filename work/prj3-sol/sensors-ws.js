@@ -29,21 +29,65 @@ const base = '/sensor-types';
 function setupRoutes(app){
   app.use(cors());
   app.use(bodyParser.json());
-  app.get(base,findSensorType(app)); 
+  app.get(base,findSensorTypeList(app)); 
+  app.get(`${base}/:id`, findSensorType(app));
+  app.use(doErrors());
 }
 
-function findSensorType(app){
-  return async function(req, res){
+function findSensorTypeList(app){
+  return errorWrap(async function(req, res){
     const q = req.query || {};
-    console.log(q);
     try{
       const results = await app.locals.model.findSensorTypes(q);
       res.json(results);
     }
     catch(err){
-      console.err(err);
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
     }
-  };
+  });
+}
+
+function findSensorType(app){
+  return errorWrap(async function(req, res){
+    try{
+      const id = req.params.id;
+      const results = await app.locals.model.findSensorTypes({ id : id });
+        res.json(results);
+    }
+    catch(err){  
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function doErrors(app){
+  return async function(err, req, res, next){
+    res.status(SERVER_ERROR);
+    res.json({ code: 'SERVER_ERROR', message: err.message });
+    console.error(err);
+  }
 }
 
 function errorWrap(handler){
@@ -55,4 +99,27 @@ function errorWrap(handler){
       next(err);
     }
   };
+}
+
+/**************** Mapping Errors ****************/
+
+const ERROR_MAP = {
+  EXISTS: CONFLICT,
+  NOT_FOUND: NOT_FOUND,
+  SERVER_ERROR: SERVER_ERROR
+};
+
+function mapError(err){
+  console.log(err);
+  return err.isDomain
+    ? {
+      status: (ERROR_MAP[err.code] || BAD_REQUEST),
+      code: err.code,
+      message: err.msg
+    }
+    :{
+      status: SERVER_ERROR,
+      code: 'INTERNAL',
+      message: err.toString()
+    };
 }
