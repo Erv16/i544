@@ -24,17 +24,18 @@ function serve(port, sensors) {
 
 module.exports = { serve };
 
-const base = '/sensor-types';
+const sensorTypeBase = '/sensor-types';
 //@TODO routing function, handlers, utility functions
 function setupRoutes(app){
   app.use(cors());
   app.use(bodyParser.json());
-  app.get(base,findSensorTypeList(app)); 
-  app.get(`${base}/:id`, findSensorType(app));
+  app.get(sensorTypeBase,findSensorTypeListWs(app)); 
+  app.get(`${sensorTypeBase}/:id`, findSensorTypeWs(app));
+  app.post(sensorTypeBase, addSensorTypeWs(app))
   app.use(doErrors());
 }
 
-function findSensorTypeList(app){
+function findSensorTypeListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
     try{
@@ -58,7 +59,7 @@ function findSensorTypeList(app){
   });
 }
 
-function findSensorType(app){
+function findSensorTypeWs(app){
   return errorWrap(async function(req, res){
     try{
       const id = req.params.id;
@@ -66,6 +67,31 @@ function findSensorType(app){
         res.json(results);
     }
     catch(err){  
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function addSensorTypeWs(app){
+  return errorWrap(async function(req, res){
+    try{
+      const obj = req.body;
+      const results = await app.locals.model.addSensorType(obj);
+      res.append('Location', requestUrl(req) + '/' + obj.id);
+      res.sendStatus(CREATED);
+    }
+    catch(err){
       err[0].isDomain = true;
       const mapped = mapError(err[0]);
       let errObj = {};
@@ -122,4 +148,10 @@ function mapError(err){
       code: 'INTERNAL',
       message: err.toString()
     };
+}
+
+/**************** Utilities ****************/
+function requestUrl(req){
+  const port = req.app.locals.port;
+  return `${req.protocol}://${req.hostname}:${port}${req.originalUrl}`;
 }
