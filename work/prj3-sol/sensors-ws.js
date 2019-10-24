@@ -225,6 +225,14 @@ function findSensorDataWs(app){
     try{
       const results = await app.locals.model.findSensorData({sensorId : id});
       results.data = results.data.filter(elem => elem.timestamp === Number(timestamp));
+      if(results.data.length === 0){
+        throw[
+          {
+            code: 'NOT_FOUND',
+            msg: `no data for timestamp ${timestamp}`
+          }
+        ];
+      }
       results.nextIndex = -1;
       res.json(results);
     }
@@ -236,8 +244,8 @@ function findSensorDataWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
