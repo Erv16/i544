@@ -150,7 +150,7 @@ class Sensors {
    *
    *  All user errors must be thrown as an array of objects.
    */
-  async findSensorTypes(info) {
+  async findSensorTypes(info={}) {
     const searchSpecs = validate('findSensorTypes', info);
     const data = await this._get(this.sensorTypes, searchSpecs);
     if (info.id !== undefined && data.length === 0) {
@@ -194,7 +194,7 @@ class Sensors {
    *
    *  All user errors must be thrown as an array of objects.
    */
-  async findSensors(info) {
+  async findSensors(info={}) {
     const searchSpecs = validate('findSensors', info);
     const sensors = await this._get(this.sensors, searchSpecs);
     if (info.id !== undefined && sensors.length === 0) {
@@ -252,7 +252,7 @@ class Sensors {
    *
    *  All user errors must be thrown as an array of objects.
    */
-  async findSensorData(info) {
+  async findSensorData(info={}) {
     const searchSpecs = validate('findSensorData', info);
     const { sensorId, timestamp, statuses } = searchSpecs;
     const count = searchSpecs._count;

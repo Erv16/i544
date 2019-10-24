@@ -29,6 +29,7 @@ module.exports = { serve };
 
 const sensorTypeBase = '/sensor-types';
 const sensorBase = '/sensors';
+const sensorDataBase = '/sensor-data';
 
 function setupRoutes(app){
   app.use(cors());
@@ -39,6 +40,8 @@ function setupRoutes(app){
   app.get(sensorBase, findSensorsListWs(app));
   app.get(`${sensorBase}/:id`,findSensorsWs(app))
   app.post(sensorBase, addSensorWs(app));
+  app.get(`${sensorDataBase}/:id`,findSensorDataListWs(app));
+  app.get(`${sensorDataBase}/:id/:timestamp`, findSensorDataWs(app));
   app.use(doErrors());
 }
 
@@ -172,6 +175,61 @@ function addSensorWs(app){
       res.sendStatus(CREATED);
     }
     catch(err){
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function findSensorDataListWs(app){
+  return errorWrap(async function(req, res){
+    const id = req.params.id;
+    const q = req.query || {};
+    q.sensorId = id;
+    try{
+      const results = await app.locals.model.findSensorData(q);
+      res.json(results);
+    }
+    catch(err){  
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "message":mapped.message,
+            "code":mapped.code
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function findSensorDataWs(app){
+  return errorWrap(async function(req,res){
+    const id = req.params.id;
+    const timestamp = req.params.timestamp;
+    console.log(timestamp);
+    try{
+      const results = await app.locals.model.findSensorData({sensorId : id});
+      results.data = results.data.filter(elem => elem.timestamp === Number(timestamp));
+      results.nextIndex = -1;
+      res.json(results);
+    }
+    catch(err){  
+      console.log(err);
       err[0].isDomain = true;
       const mapped = mapError(err[0]);
       let errObj = {};
