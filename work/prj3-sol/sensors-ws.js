@@ -42,14 +42,21 @@ function setupRoutes(app){
   app.post(sensorBase, addSensorWs(app));
   app.get(`${sensorDataBase}/:id`,findSensorDataListWs(app));
   app.get(`${sensorDataBase}/:id/:timestamp`, findSensorDataWs(app));
+  app.post(`${sensorDataBase}/:id`, addSensordDataWs(app));
   app.use(doErrors());
 }
 
 function findSensorTypeListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
+    let url = requestUrl(req);
+    url = url.substring(0,url.indexOf("?"));
     try{
       const results = await app.locals.model.findSensorTypes(q);
+      results.self = requestUrl(req);
+      for(let i = 0; i < results.data.length; i++){
+        results.data[i].self = url+`/${results.data[i].id}`;
+      }
       res.json(results);
     }
     catch(err){
@@ -59,8 +66,8 @@ function findSensorTypeListWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -73,7 +80,13 @@ function findSensorTypeWs(app){
   return errorWrap(async function(req, res){
     try{
       const id = req.params.id;
+      let url = requestUrl(req);
+      url = url.substring(0,url.indexOf("?"));
       const results = await app.locals.model.findSensorTypes({ id : id });
+      results.self = requestUrl(req);
+      for(let i = 0; i < results.data.length; i++){
+        results.data[i].self = url+`/${results.data[i].id}`;
+      }
         res.json(results);
     }
     catch(err){  
@@ -83,8 +96,8 @@ function findSensorTypeWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -108,8 +121,8 @@ function addSensorTypeWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -121,8 +134,14 @@ function addSensorTypeWs(app){
 function findSensorsListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
+    let url = requestUrl(req);
+    url = url.substring(0,url.indexOf("?"));
     try{
       const results = await app.locals.model.findSensors(q);
+      results.self = requestUrl(req);
+      for(let i = 0; i < results.data.length; i++){
+        results.data[i].self = url+`/${results.data[i].id}`;
+      }
       res.json(results);
     }
     catch(err){
@@ -132,8 +151,8 @@ function findSensorsListWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -146,7 +165,13 @@ function findSensorsWs(app){
   return errorWrap(async function(req, res){
     try{
       const id = req.params.id;
+      let url = requestUrl(req);
+      url = url.substring(0,url.indexOf("?"));
       const results = await app.locals.model.findSensors({ id : id });
+      results.self = requestUrl(req);
+      for(let i = 0; i < results.data.length; i++){
+        results.data[i].self = url+`/${results.data[i].id}`;
+      }
         res.json(results);
     }
     catch(err){  
@@ -156,8 +181,8 @@ function findSensorsWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -181,8 +206,8 @@ function addSensorWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -194,10 +219,16 @@ function addSensorWs(app){
 function findSensorDataListWs(app){
   return errorWrap(async function(req, res){
     const id = req.params.id;
+    let url = requestUrl(req);
+    url = url.substring(0,url.indexOf("?"));
     const q = req.query || {};
     q.sensorId = id;
     try{
       const results = await app.locals.model.findSensorData(q);
+      results.self = requestUrl(req);
+      for(let i = 0; i < results.data.length; i++){
+        results.data[i].self = url+`/${req.params.id}`+`/${results.data[i].timestamp}`;
+      }
       res.json(results);
     }
     catch(err){  
@@ -207,8 +238,8 @@ function findSensorDataListWs(app){
       errObj = {
         "errors": [
           {
-            "message":mapped.message,
-            "code":mapped.code
+            "code":mapped.code,
+            "message":mapped.message
           }
         ]
       };
@@ -221,6 +252,8 @@ function findSensorDataWs(app){
   return errorWrap(async function(req,res){
     const id = req.params.id;
     const timestamp = req.params.timestamp;
+    let url = requestUrl(req);
+    url = url.substring(0,url.indexOf("?"));
     console.log(timestamp);
     try{
       const results = await app.locals.model.findSensorData({sensorId : id});
@@ -234,10 +267,38 @@ function findSensorDataWs(app){
         ];
       }
       results.nextIndex = -1;
+      results.data[0].self = url+`/${results.data[0].sensorId}`+`/${results.data[0].timestamp}`;
       res.json(results);
     }
     catch(err){  
       console.log(err);
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "code":mapped.code,
+            "message":mapped.message
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
+}
+
+function addSensordDataWs(app){
+  return errorWrap(async function(req, res){
+    try{
+      const obj = req.body;
+      obj.sensorId = Number(req.params.id);
+      console.log(obj);
+      const results = await app.locals.model.addSensorData(obj);
+      res.append('Location', requestUrl(req) + '/' + obj.id);
+      res.sendStatus(CREATED);
+    }
+    catch(err){
       err[0].isDomain = true;
       const mapped = mapError(err[0]);
       let errObj = {};

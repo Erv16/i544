@@ -299,6 +299,8 @@ class Sensors {
     return ret;
   }
 
+  //Add new method to return sensorData for a particular sensorId and timestamp
+
   async _add(collection, info) {
     const mongoInfo = toMongoInfo(info);
     assert(mongoInfo._id !== undefined);
