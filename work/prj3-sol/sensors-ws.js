@@ -50,7 +50,7 @@ function findSensorTypeListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
     let url = requestUrl(req);
-    url = url.substring(0,url.indexOf("?"));
+    url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
     try{
       const results = await app.locals.model.findSensorTypes(q);
       results.self = requestUrl(req);
@@ -81,7 +81,7 @@ function findSensorTypeWs(app){
     try{
       const id = req.params.id;
       let url = requestUrl(req);
-      url = url.substring(0,url.indexOf("?"));
+      url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
       const results = await app.locals.model.findSensorTypes({ id : id });
       results.self = requestUrl(req);
       for(let i = 0; i < results.data.length; i++){
@@ -135,7 +135,7 @@ function findSensorsListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
     let url = requestUrl(req);
-    url = url.substring(0,url.indexOf("?"));
+    url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
     try{
       const results = await app.locals.model.findSensors(q);
       results.self = requestUrl(req);
@@ -166,7 +166,7 @@ function findSensorsWs(app){
     try{
       const id = req.params.id;
       let url = requestUrl(req);
-      url = url.substring(0,url.indexOf("?"));
+      url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
       const results = await app.locals.model.findSensors({ id : id });
       results.self = requestUrl(req);
       for(let i = 0; i < results.data.length; i++){
@@ -220,7 +220,7 @@ function findSensorDataListWs(app){
   return errorWrap(async function(req, res){
     const id = req.params.id;
     let url = requestUrl(req);
-    url = url.substring(0,url.indexOf("?"));
+    url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url
     const q = req.query || {};
     q.sensorId = id;
     try{
@@ -253,11 +253,12 @@ function findSensorDataWs(app){
     const id = req.params.id;
     const timestamp = req.params.timestamp;
     let url = requestUrl(req);
-    url = url.substring(0,url.indexOf("?"));
+    url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
     console.log(timestamp);
     try{
-      const results = await app.locals.model.findSensorData({sensorId : id});
-      results.data = results.data.filter(elem => elem.timestamp === Number(timestamp));
+      const results = await app.locals.model.findSensorData({sensorId : id, timestamp: timestamp});
+      console.log(results);
+      results.data = results.data.filter(elem => elem.timestamp === Number(req.params.timestamp));
       if(results.data.length === 0){
         throw[
           {
@@ -292,7 +293,7 @@ function addSensordDataWs(app){
   return errorWrap(async function(req, res){
     try{
       const obj = req.body;
-      obj.sensorId = Number(req.params.id);
+      obj.sensorId = req.params.id;
       console.log(obj);
       const results = await app.locals.model.addSensorData(obj);
       res.append('Location', requestUrl(req) + '/' + obj.id);
