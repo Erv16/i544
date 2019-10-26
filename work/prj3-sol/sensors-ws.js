@@ -49,14 +49,40 @@ function setupRoutes(app){
 function findSensorTypeListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
+    let nextObj = q;
+    let prevObj = q;
     let url = requestUrl(req);
     url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
+    
     try{
       const results = await app.locals.model.findSensorTypes(q);
       results.self = requestUrl(req);
       for(let i = 0; i < results.data.length; i++){
         results.data[i].self = url+`/${results.data[i].id}`;
       }
+
+      if(results.nextIndex !== -1){
+        let testurl = url;
+          nextObj._index = results.nextIndex;
+        testurl += '?';
+        for(key in nextObj){
+          testurl += key + '=' + nextObj[key] + '&';
+        }
+        testurl = testurl.slice(0,-1);
+        results.next = testurl;
+      }
+
+      if(results.previousIndex > 0){
+        let testurl = url;
+        prevObj._index = results.previousIndex;
+        testurl += '?';
+        for(key in prevObj){
+          testurl += key + '=' + prevObj[key] + '&';
+        }
+        testurl = testurl.slice(0,-1);
+        results.prev = testurl;
+      }
+
       res.json(results);
     }
     catch(err){
@@ -85,7 +111,7 @@ function findSensorTypeWs(app){
       const results = await app.locals.model.findSensorTypes({ id : id });
       results.self = requestUrl(req);
       for(let i = 0; i < results.data.length; i++){
-        results.data[i].self = url+`/${results.data[i].id}`;
+        results.data[i].self = url;
       }
         res.json(results);
     }
@@ -134,6 +160,8 @@ function addSensorTypeWs(app){
 function findSensorsListWs(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
+    let nextObj = q;
+    let prevObj = q;
     let url = requestUrl(req);
     url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
     try{
@@ -142,6 +170,40 @@ function findSensorsListWs(app){
       for(let i = 0; i < results.data.length; i++){
         results.data[i].self = url+`/${results.data[i].id}`;
       }
+
+      // if(results.nextIndex !== -1){
+      //   results.next = url + `?_index=${results.nextIndex}`;
+      //   if(q._count !== undefined){
+      //     results.next = results.next + `&_count=${q._count}`;
+      //   }
+      // }
+
+      // if(results.previousIndex > 0 && q._count !== undefined){
+      //   results.prev = url + `?_index=${results.previousIndex}&_count=${q._count}`;
+      // }
+
+      if(results.nextIndex !== -1){
+        let testurl = url;
+          nextObj._index = results.nextIndex;
+        testurl += '?';
+        for(key in nextObj){
+          testurl += key + '=' + nextObj[key] + '&';
+        }
+        testurl = testurl.slice(0,-1);
+        results.next = testurl;
+      }
+
+      if(results.previousIndex > 0){
+        let testurl = url;
+        prevObj._index = results.previousIndex;
+        testurl += '?';
+        for(key in prevObj){
+          testurl += key + '=' + prevObj[key] + '&';
+        }
+        testurl = testurl.slice(0,-1);
+        results.prev = testurl;
+      }
+
       res.json(results);
     }
     catch(err){
@@ -170,7 +232,7 @@ function findSensorsWs(app){
       const results = await app.locals.model.findSensors({ id : id });
       results.self = requestUrl(req);
       for(let i = 0; i < results.data.length; i++){
-        results.data[i].self = url+`/${results.data[i].id}`;
+        results.data[i].self = url;
       }
         res.json(results);
     }
@@ -227,7 +289,7 @@ function findSensorDataListWs(app){
       const results = await app.locals.model.findSensorData(q);
       results.self = requestUrl(req);
       for(let i = 0; i < results.data.length; i++){
-        results.data[i].self = url+`/${req.params.id}`+`/${results.data[i].timestamp}`;
+        results.data[i].self = url + `/${results.data[i].timestamp}`;
       }
       res.json(results);
     }
@@ -254,10 +316,8 @@ function findSensorDataWs(app){
     const timestamp = req.params.timestamp;
     let url = requestUrl(req);
     url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
-    console.log(timestamp);
     try{
       const results = await app.locals.model.findSensorData({sensorId : id, timestamp: timestamp});
-      console.log(results);
       results.data = results.data.filter(elem => elem.timestamp === Number(req.params.timestamp));
       if(results.data.length === 0){
         throw[
@@ -268,7 +328,8 @@ function findSensorDataWs(app){
         ];
       }
       results.nextIndex = -1;
-      results.data[0].self = url+`/${results.data[0].sensorId}`+`/${results.data[0].timestamp}`;
+      results.self = url;
+      results.data[0].self = url;
       res.json(results);
     }
     catch(err){  
