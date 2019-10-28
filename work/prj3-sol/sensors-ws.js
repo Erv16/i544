@@ -317,7 +317,8 @@ function findSensorDataWs(app){
     let url = requestUrl(req);
     url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
     try{
-      const results = await app.locals.model.findSensorData({sensorId : id, timestamp: timestamp});
+      const results = await app.locals.model.findSensorData({sensorId : id, timestamp: timestamp, statuses: 'all'});
+      console.log(results);
       results.data = results.data.filter(elem => elem.timestamp === Number(req.params.timestamp));
       if(results.data.length === 0){
         throw[
