@@ -34,19 +34,19 @@ const sensorDataBase = '/sensor-data';
 function setupRoutes(app){
   app.use(cors());
   app.use(bodyParser.json());
-  app.get(sensorTypeBase,findSensorTypeListWs(app)); 
-  app.get(`${sensorTypeBase}/:id`, findSensorTypeWs(app));
-  app.post(sensorTypeBase, addSensorTypeWs(app));
-  app.get(sensorBase, findSensorsListWs(app));
-  app.get(`${sensorBase}/:id`,findSensorsWs(app))
-  app.post(sensorBase, addSensorWs(app));
-  app.get(`${sensorDataBase}/:id`,findSensorDataListWs(app));
-  app.get(`${sensorDataBase}/:id/:timestamp`, findSensorDataWs(app));
-  app.post(`${sensorDataBase}/:id`, addSensordDataWs(app));
+  app.get(sensorTypeBase,findSensorTypeList(app)); 
+  app.get(`${sensorTypeBase}/:id`, findSensorType(app));
+  app.post(sensorTypeBase, addSensorType(app));
+  app.get(sensorBase, findSensorsList(app));
+  app.get(`${sensorBase}/:id`,findSensors(app))
+  app.post(sensorBase, addSensor(app));
+  app.get(`${sensorDataBase}/:id`,findSensorDataList(app));
+  app.get(`${sensorDataBase}/:id/:timestamp`, findSensorData(app));
+  app.post(`${sensorDataBase}/:id`, addSensordData(app));
   app.use(doErrors());
 }
 
-function findSensorTypeListWs(app){
+function findSensorTypeList(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
     let nextObj = q;
@@ -102,7 +102,7 @@ function findSensorTypeListWs(app){
   });
 }
 
-function findSensorTypeWs(app){
+function findSensorType(app){
   return errorWrap(async function(req, res){
     try{
       const id = req.params.id;
@@ -132,7 +132,7 @@ function findSensorTypeWs(app){
   });
 }
 
-function addSensorTypeWs(app){
+function addSensorType(app){
   return errorWrap(async function(req, res){
     try{
       const obj = req.body;
@@ -157,7 +157,7 @@ function addSensorTypeWs(app){
   });
 }
 
-function findSensorsListWs(app){
+function findSensorsList(app){
   return errorWrap(async function(req, res){
     const q = req.query || {};
     let nextObj = q;
@@ -170,17 +170,6 @@ function findSensorsListWs(app){
       for(let i = 0; i < results.data.length; i++){
         results.data[i].self = url+`/${results.data[i].id}`;
       }
-
-      // if(results.nextIndex !== -1){
-      //   results.next = url + `?_index=${results.nextIndex}`;
-      //   if(q._count !== undefined){
-      //     results.next = results.next + `&_count=${q._count}`;
-      //   }
-      // }
-
-      // if(results.previousIndex > 0 && q._count !== undefined){
-      //   results.prev = url + `?_index=${results.previousIndex}&_count=${q._count}`;
-      // }
 
       if(results.nextIndex !== -1){
         let testurl = url;
@@ -223,7 +212,7 @@ function findSensorsListWs(app){
   });
 }
 
-function findSensorsWs(app){
+function findSensors(app){
   return errorWrap(async function(req, res){
     try{
       const id = req.params.id;
@@ -253,7 +242,7 @@ function findSensorsWs(app){
   });
 }
 
-function addSensorWs(app){
+function addSensor(app){
   return errorWrap(async function(req, res){
     try{
       const obj = req.body;
@@ -278,7 +267,7 @@ function addSensorWs(app){
   });
 }
 
-function findSensorDataListWs(app){
+function findSensorDataList(app){
   return errorWrap(async function(req, res){
     const id = req.params.id;
     let url = requestUrl(req);
@@ -310,7 +299,7 @@ function findSensorDataListWs(app){
   });
 }
 
-function findSensorDataWs(app){
+function findSensorData(app){
   return errorWrap(async function(req,res){
     const id = req.params.id;
     const timestamp = req.params.timestamp;
@@ -351,7 +340,7 @@ function findSensorDataWs(app){
   });
 }
 
-function addSensordDataWs(app){
+function addSensordData(app){
   return errorWrap(async function(req, res){
     try{
       const obj = req.body;

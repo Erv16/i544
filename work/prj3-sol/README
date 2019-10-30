@@ -2,5 +2,8 @@ Name:		Erwin Joshua Palani
 B-Number:	B00755963
 Email:		epalani1@binghamton.edu
 
-Add text here as needed.
+Different routes have been added for querying. 
+The query can have multiple parameters or can be queries using a very specific parameter.
+Have tested against all the test cases provided in the anonotated log successfully and depicts the required functionality.
+
 
