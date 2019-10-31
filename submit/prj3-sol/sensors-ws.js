@@ -43,6 +43,30 @@ function setupRoutes(app){
   app.get(`${sensorDataBase}/:id`,findSensorDataList(app));
   app.get(`${sensorDataBase}/:id/:timestamp`, findSensorData(app));
   app.post(`${sensorDataBase}/:id`, addSensordData(app));
+  app.get('/*', function(req,res){
+    try{
+      throw[
+        {
+          code: 'NOT_FOUND',
+          msg: `${requestUrl(req)} is not a valid url`
+        }
+      ];
+    }
+    catch(err){
+      err[0].isDomain = true;
+      const mapped = mapError(err[0]);
+      let errObj = {};
+      errObj = {
+        "errors": [
+          {
+            "code":mapped.code,
+            "message":mapped.message
+          }
+        ]
+      };
+      res.status(mapped.status).json(errObj);
+    }
+  });
   app.use(doErrors());
 }
 
@@ -307,7 +331,6 @@ function findSensorData(app){
     url = (url.indexOf("?") !== -1)?url.substring(0,url.indexOf("?")):url;
     try{
       const results = await app.locals.model.findSensorData({sensorId : id, timestamp: timestamp, statuses: 'all'});
-      console.log(results);
       results.data = results.data.filter(elem => elem.timestamp === Number(req.params.timestamp));
       if(results.data.length === 0){
         throw[
@@ -322,8 +345,7 @@ function findSensorData(app){
       results.data[0].self = url;
       res.json(results);
     }
-    catch(err){  
-      console.log(err);
+    catch(err){ 
       err[0].isDomain = true;
       const mapped = mapError(err[0]);
       let errObj = {};
@@ -345,7 +367,6 @@ function addSensordData(app){
     try{
       const obj = req.body;
       obj.sensorId = req.params.id;
-      console.log(obj);
       const results = await app.locals.model.addSensorData(obj);
       res.append('Location', requestUrl(req) + '/' + obj.id);
       res.sendStatus(CREATED);
@@ -395,7 +416,7 @@ const ERROR_MAP = {
 };
 
 function mapError(err){
-  console.log(err);
+  //console.log(err);
   return err.isDomain
     ? {
       status: (ERROR_MAP[err.code] || BAD_REQUEST),
