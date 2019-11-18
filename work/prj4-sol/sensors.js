@@ -12,11 +12,97 @@ const widgetView = require('./widget-view');
 const STATIC_DIR = 'statics';
 const TEMPLATES_DIR = 'templates';
 
+const mustache = new Mustache();
+
 function serve(port, model, base='') {
   //@TODO
+  const app = express();
+  app.locals.port = port;
+  app.locals.base = base;
+  app.locals.model = model;
+  process.chdir(__dirname);
+  app.use(base, express.static(STATIC_DIR));
+  setUpRoutes(app);
+  app.listen(port, function(){
+    console.log(`listening on port ${port}`);
+  });
 }
 
 
 module.exports = serve;
 
 //@TODO
+function setUpRoutes(app){
+  const base = app.locals.base;
+  app.get(`${base}/sensor-types.html`,searchSensorTypes(app));
+}
+
+function searchSensorTypes(app){
+  return async function(req,res){
+    const sensorTypeWidgetDef = [{
+      name: 'id',
+      label: 'Sensor Type Id',
+      type: 'text',
+      value: '',
+      classes: ['tst-sensor-type-id']
+    },
+    {
+      name: 'modelNumber',
+      label: 'Model Number',
+      type: 'text',
+      value: '',
+      classes: ['tst-model-number']
+    },
+    {
+      name: 'manufacturer',
+      label: 'Manufacturer',
+      type: 'text',
+      value: '',
+      classes: ['tst-manufacturer']
+    },
+    { type: 'select',
+      name: 'quantity',
+      label: 'Measure',
+      choices: {
+        '': 'Select',
+        temperature: 'Temperature',
+        pressure: 'Pressure',
+        flow: 'Flow Rate',
+        humidity: 'Relative Humidity'
+      },
+      classes: [ 'tst-quantity' ], 
+      val: '',
+    }
+    ];
+
+    let widgetPartial = '';
+
+    for(const widget of sensorTypeWidgetDef){
+      const view = widgetView(widget);
+      widgetPartial += mustache.render('widget',view);
+    }
+
+    const sensorTypeData = await app.locals.model.list('sensor-types',req.query); 
+    //console.log(sensorTypeData);
+    let next = '';
+    let prev = '';
+    let nextFlag = false;
+    let prevFlag = false;
+    if(sensorTypeData.hasOwnProperty('next')){
+      nextFlag = true;
+      next = sensorTypeData.next.substr(sensorTypeData.next.indexOf('?'));
+    } 
+    
+    if(sensorTypeData.hasOwnProperty('prev')){
+      prevFlag = true;
+      prev = sensorTypeData.prev.substr(sensorTypeData.prev.indexOf('?'));
+    }
+
+    const model = {widget: widgetPartial, sensorTypeData : sensorTypeData.data,
+      next: nextFlag ? next : false, 
+      prev: prevFlag ? prev : false};
+    const html = mustache.render('sensor-type',model);
+    res.send(html);
+  };
+};
+

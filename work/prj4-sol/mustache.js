@@ -31,3 +31,4 @@ module.exports = Mustache;
 Mustache.prototype.render = function(templateId, view) {
   return mustache.render(this.templates[templateId], view, this.templates);
 }
+
