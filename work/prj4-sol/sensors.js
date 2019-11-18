@@ -35,10 +35,12 @@ module.exports = serve;
 function setUpRoutes(app){
   const base = app.locals.base;
   app.get(`${base}/sensor-types.html`,searchSensorTypes(app));
+  app.get(`${base}/sensors.html`,searchSensors(app));
 }
 
 function searchSensorTypes(app){
   return async function(req,res){
+    let errors = {};
     const sensorTypeWidgetDef = [{
       name: 'id',
       label: 'Sensor Type Id',
@@ -82,8 +84,14 @@ function searchSensorTypes(app){
       widgetPartial += mustache.render('widget',view);
     }
 
-    const sensorTypeData = await app.locals.model.list('sensor-types',req.query); 
-    //console.log(sensorTypeData);
+    let sensorTypeData = {};
+    try{
+      sensorTypeData = await app.locals.model.list('sensor-types',req.query); 
+    }
+    catch(err){
+      console.log(err);
+    }
+
     let next = '';
     let prev = '';
     let nextFlag = false;
@@ -105,4 +113,72 @@ function searchSensorTypes(app){
     res.send(html);
   };
 };
+
+function searchSensors(app){
+  return async function(req,res){
+    const sensorWidgetDef = [{
+      name: 'id',
+      label: 'Sensor Id',
+      type: 'text',
+      value: '',
+      classes: ['tst-sensor-id']
+    },
+    {
+      name: 'model',
+      label: 'Model',
+      type: 'text',
+      value: '',
+      classes: ['tst-model']
+    },
+    {
+      name: 'period',
+      label: 'Period',
+      type: 'text',
+      value: '',
+      classes: ['tst-period numeric']
+    }];
+
+    let widgetPartial = '';
+
+    for(const widget of sensorWidgetDef){
+      const view = widgetView(widget);
+      widgetPartial += mustache.render('widget',view);
+    }
+
+    let sensorData = {};
+    try{
+      sensorData = await app.locals.model.list('sensors',req.query); 
+    }
+    catch(err){
+      console.log(err);
+    }
+
+    let next = '';
+    let prev = '';
+    let nextFlag = false;
+    let prevFlag = false;
+    if(sensorData.hasOwnProperty('next')){
+      nextFlag = true;
+      next = sensorData.next.substr(sensorData.next.indexOf('?'));
+    } 
+    
+    if(sensorData.hasOwnProperty('prev')){
+      prevFlag = true;
+      prev = sensorData.prev.substr(sensorData.prev.indexOf('?'));
+    }
+
+    const model = {widget: widgetPartial, sensorData : sensorData.data,
+                  next: nextFlag ? next : false, 
+                  prev: prevFlag ? prev : false};    
+
+    const html = mustache.render('sensor',model);
+    res.send(html);
+  };
+};
+
+function wsErrors(err){
+  const msg = (err.message) ? err.message : 'web service error';
+  console.error(msg);
+  return { _: [ msg ] };
+}
 
