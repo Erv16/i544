@@ -179,6 +179,7 @@ if (require.main === module) {
   ];
   for (const widget of WIDGETS) {
     const view = widgetView(widget, widget.val, widget.errors);
+    console.log(widget.val);
     console.log(mustache.render('widget', view));
   }
 }
