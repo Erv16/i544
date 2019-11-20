@@ -610,6 +610,14 @@ function validate(type, value){
           if(value[prop] === ''){
             errorValidation[prop] = field_info.requiredError;
           }
+          else if(value[prop] !== ''){
+            if(!value[prop].match(field_info.regex)){
+              errorValidation[prop] = field_info.error;
+            }
+            else{
+              delete errorValidation[prop];
+            }
+          }
           else{
             delete errorValidation[prop];
           }
@@ -617,6 +625,17 @@ function validate(type, value){
         else if(prop === 'limits'){
           if(value[prop].min === '' || value[prop].max === ''){
             errorValidation[prop] = field_info.requiredError;
+          }
+          else if(value[prop].min !== '' || value[prop].max !== ''){
+            if(!value[prop].min.match(field_info.min.regex)){
+              errorValidation[prop] = field_info.min.error;
+            }
+            else if(!value[prop].max.match(field_info.max.regex)){
+              errorValidation[prop] = field_info.max.error;
+            }
+            else{
+              delete errorValidation[prop];
+            }
           }
           else{
             delete errorValidation[prop];
