@@ -45,15 +45,34 @@ function setUpRoutes(app){
 const sensorTypeField = {
   id:{
     regex: /^[a-zA-Z0-9\-\_]+$/,
-    error: "Sensor Type ID field can contain only alphanumerics, '-' or '_' characters"
+    error: "Sensor Type ID field can contain only alphanumerics, '-' or '_' characters",
+    requiredError: "A value for 'Sensor Type ID' must be provided"
   },
   modelNumber:{
     regex: /^[a-zA-Z0-9\-\' ]+$/,
-    error: "Model Number field can contain only alphanumerics, '-',' or space"
+    error: "Model Number field can contain only alphanumerics, '-',' or space",
+    requiredError: "A value for 'Model Number' must be provided"
   },
   manufacturer:{
     regex: /^[a-zA-Z\-\' ]+$/,
-    error: "The Manufacturer field can contain only alphabetics, '-',' or space"
+    error: "The Manufacturer field can contain only alphabetics, '-',' or space",
+    requiredError: "A value for 'Manufacturer' must be provided"
+  },
+  quantity:{
+    regex: /\b(?:temperature|flow|pressure|humidity)\b/,
+    error: "The Measure field must be one of Select, Temperature, Pressure, Flow Rate, Relative Humidity",
+    requiredError: "A value for 'Quantity' must be provided"
+  },
+  limits:{
+    min:{
+      regex: /[0-9]/,
+      error: "Min for 'Limits' must be a number",
+    },
+    max:{
+      regex:/[0-9]/,
+      error: "Max for 'Limits' must be a number",
+    },
+    requiredError: "Both Min and Max values must be specified for 'Limits'"
   }
 };
 
@@ -71,6 +90,9 @@ const sensorField = {
     error: "The Period field must be an integer"
   }
 };
+
+let errorValidation = [];
+let addSensorTypeWidgetDef = [];
 
 function searchSensorTypes(app){
   return async function(req,res){
@@ -113,7 +135,7 @@ function searchSensorTypes(app){
       },
       classes: [ 'tst-quantity' ], 
       val: (`${req.query.quantity}` === undefined)?'Select':`${req.query.quantity}`,
-      errors: ''
+      errors: errorModel('sensor-types', 'quantity', req.query.quantity)
     }
     ];
 
@@ -177,7 +199,7 @@ function searchSensors(app){
     let displaySummary = true;
     const sensorWidgetDef = [{
       name: 'id',
-      label: 'Sensor Id',
+      label: 'Sensor ID',
       type: 'text',
       val: (`${req.query.id}` === 'undefined')?'':`${req.query.id}`,
       classes: ['tst-sensor-id'],
@@ -257,27 +279,29 @@ function searchSensors(app){
 
 function createUpdateSensorTypeForm(app){
   return async function(req, res){
-
-    const addSensorTypeWidgetDef = [{
+    addSensorTypeWidgetDef = [{
       name: 'id',
       label: 'Sensor Type ID *',
       type: 'text',
       value: '',
-      classes: ['tst-sensor-type-id']
+      classes: ['tst-sensor-type-id'],
+      errors : ''
     },
     {
       name: 'modelNumber',
       label: 'Model Number *',
       type: 'text',
       value: '',
-      classes: ['tst-model-number']
+      classes: ['tst-model-number'],
+      errors: ''
     },
     {
       name: 'manufacturer',
       label: 'Manufacturer *',
       type: 'text',
       value: '',
-      classes: ['tst-manufacturer']
+      classes: ['tst-manufacturer'],
+      errors: ''
     },
     {
       type: 'select',
@@ -291,7 +315,8 @@ function createUpdateSensorTypeForm(app){
         humidity: 'Relative Humidity'
       },
       classes: [ 'tst-quantity' ], 
-      value: ''
+      value: '',
+      errors: ''
     },
     {
       type: 'interval',
@@ -299,12 +324,13 @@ function createUpdateSensorTypeForm(app){
       label: 'Limits *',
       value: { min: '', max: ''},
       classes: [ 'numeric interval' ],
-    }];
+      errors: ''
+    }];    
 
     let addSensorTypeWidgetPartial = '';
 
     for(const widget of addSensorTypeWidgetDef){
-      const view = widgetView(widget);
+      const view = widgetView(widget, {error: widget.errors});
       addSensorTypeWidgetPartial += mustache.render('widget',view);
     }
 
@@ -316,40 +342,98 @@ function createUpdateSensorTypeForm(app){
 
 function createUpdateSensorType(app){
   return async function(req,res){
-    const sensorTypeContent = clean(req.body);
-    switch(sensorTypeContent.qunatity){
-      case 'temperature':
-          sensorTypeContent.unit = 'C';
-          break;
-      case 'pressure':
-          sensorTypeContent.unit = 'PSI';
-          break;
-      case 'flow':
-          sensorTypeContent.unit = 'gpm';
-          break;
-      case 'humidity':
-          sensorTypeContent.unit = '%';
-          break;
+    //console.log(req.body);
+    const sensorTypeContent = req.body;
+    let errors = validate('sensor-types',sensorTypeContent);
+   //console.log('SCT',sensorTypeContent.limits.min);
+    if(!errors){
+      switch(sensorTypeContent.quantity){
+        case 'temperature':
+            sensorTypeContent.unit = 'C';
+            break;
+        case 'pressure':
+            sensorTypeContent.unit = 'PSI';
+            break;
+        case 'flow':
+            sensorTypeContent.unit = 'gpm';
+            break;
+        case 'humidity':
+            sensorTypeContent.unit = '%';
+            break;
+      }
+      try{
+        await app.locals.model.update('sensor-types',sensorTypeContent);
+        res.redirect(`${app.locals.base}/sensor-types.html?id=${sensorTypeContent.id}`)
+      }
+      catch(err){
+        console.error(err);
+      }
     }
-    // if(sensorTypeContent.quantity === 'temperature'){
-    //   sensorTypeContent.unit = 'C';
-    // }
-    // if(sensorTypeContent.quantity === 'pressure'){
-    //   sensorTypeContent.unit = 'PSI';
-    // }
-    // if(sensorTypeContent.quantity === 'flow'){
-    //   sensorTypeContent.unit = 'gpm';
-    // }
-    // if(sensorTypeContent.quantity === 'humidity'){
-    //   sensorTypeContent.unit = '%';
-    // }
-    try{
-      await app.locals.model.update('sensor-types',sensorTypeContent);
-      res.redirect(`${app.locals.base}/sensor-types.html?id=${sensorTypeContent.id}`)
+    if(errors){
+      const addSensorTypeErrorWidgetDef = [{
+        name: 'id',
+        label: 'Sensor Type ID *',
+        type: 'text',
+        value: (`${sensorTypeContent.id}` === undefined)?'':`${sensorTypeContent.id}`,
+        classes: ['tst-sensor-type-id'],
+        errors : ''
+      },
+      {
+        name: 'modelNumber',
+        label: 'Model Number *',
+        type: 'text',
+        value: (`${sensorTypeContent.modelNumber}` === undefined)?'':`${sensorTypeContent.modelNumber}`,
+        classes: ['tst-model-number'],
+        errors: ''
+      },
+      {
+        name: 'manufacturer',
+        label: 'Manufacturer *',
+        type: 'text',
+        value: (`${sensorTypeContent.manufacturer}` === undefined)?'':`${sensorTypeContent.manufacturer}`,
+        classes: ['tst-manufacturer'],
+        errors: ''
+      },
+      {
+        type: 'select',
+        name: 'quantity',
+        label: 'Measure',
+        choices: {
+          '': 'Select',
+          temperature: 'Temperature',
+          pressure: 'Pressure',
+          flow: 'Flow Rate',
+          humidity: 'Relative Humidity'
+        },
+        classes: [ 'tst-quantity' ], 
+        value: (`${sensorTypeContent.quantity}` === undefined)?'':`${sensorTypeContent.quantity}`,
+        errors: ''
+      },
+      {
+        type: 'interval',
+        name: 'limits',
+        label: 'Limits *',
+        value: { min: (`${sensorTypeContent.limits.min}` === undefined)?'':`${sensorTypeContent.limits.min}`, 
+                 max: (`${sensorTypeContent.limits.max}` === undefined)?'':`${sensorTypeContent.limits.max}`},
+        classes: [ 'numeric interval' ],
+        errors: ''
+      }];
+
+      for(let i = 0; i < addSensorTypeErrorWidgetDef.length; i++){
+        addSensorTypeErrorWidgetDef[i].errors = errorValidation[addSensorTypeErrorWidgetDef[i].name];
+      }
+      let addSensorTypeWidgetPartial = '';
+
+    for(const widget of addSensorTypeErrorWidgetDef){
+      const view = widgetView(widget, {value: widget.value, error: widget.errors});
+      addSensorTypeWidgetPartial += mustache.render('widget',view);
     }
-    catch(err){
-      console.error(err);
+
+    let model = {sensorType: true, sensorTypeWidget: addSensorTypeWidgetPartial};
+    const html = mustache.render('add', model);
+    res.send(html);
     }
+    
   };
 };
 
@@ -449,5 +533,34 @@ function errorModel(type, name, value){
       break;
   }
   return errorMsg;
+}
+
+function validate(type, value){
+  switch(type){
+    case 'sensor-types':
+      let field_info;
+      for(let prop in value){
+        field_info = sensorTypeField[prop];
+        if(prop !== 'limits'){
+          if(value[prop] === ''){
+            errorValidation[prop] = field_info.requiredError;
+          }
+          else{
+            delete errorValidation[prop];
+          }
+        }
+        else if(prop === 'limits'){
+          if(value[prop].min === '' || value[prop].max === ''){
+            errorValidation[prop] = field_info.requiredError;
+          }
+          else{
+            delete errorValidation[prop];
+          }
+        }
+      }
+      console.log(errorValidation);
+      break;
+  }
+  return Object.keys(errorValidation).length > 0 && errorValidation;
 }
 
