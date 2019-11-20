@@ -79,20 +79,33 @@ const sensorTypeField = {
 const sensorField = {
   id:{
     regex: /^[a-zA-Z0-9\-\_]+$/,
-    error: "Sensor ID field can contain only alphanumerics, '-' or '_' characters"
+    error: "Sensor ID field can contain only alphanumerics, '-' or '_' characters",
+    requiredError: "A value for 'Sensor ID' must be provided"
   },
   model:{
     regex: /^[a-zA-Z0-9\-\_]+$/,
-    error: "Model field can contain only alphanumerics, '-' or '_' characters"
+    error: "Model field can contain only alphanumerics, '-' or '_' characters",
+    requiredError: "A value for 'Model' must be provided"
   },
   period:{
     regex: /^([+-]?[1-9]\d*|0)$/,
-    error: "The Period field must be an integer"
+    error: "The Period field must be an integer",
+    requiredError: "A value for 'Period' must be provided"
+  },
+  expected:{
+    min:{
+      regex: /[0-9]/,
+      error: "Min for 'Expected Range' must be a number"
+    },
+    max:{
+      regex: /[0-9]/,
+      error: "Max for 'Expected Range' must be a number"
+    },
+    requiredError: "Both Min and Max values must be specified for 'Expected Range"
   }
 };
 
 let errorValidation = [];
-let addSensorTypeWidgetDef = [];
 
 function searchSensorTypes(app){
   return async function(req,res){
@@ -279,7 +292,7 @@ function searchSensors(app){
 
 function createUpdateSensorTypeForm(app){
   return async function(req, res){
-    addSensorTypeWidgetDef = [{
+    const addSensorTypeWidgetDef = [{
       name: 'id',
       label: 'Sensor Type ID *',
       type: 'text',
@@ -483,13 +496,65 @@ function createUpdateSensorForm(app){
 
 function createUpdateSensors(app){
   return async function(req,res){
-    const sensorContent = clean(req.body);
-    try{
-      await app.locals.model.update('sensors',sensorContent);
-      res.redirect(`${app.locals.base}/sensors.html?id=${sensorContent.id}`)
+    const sensorContent = req.body;
+    let errors = validate('sensors',sensorContent);
+    if(!errors){
+      try{
+        await app.locals.model.update('sensors',sensorContent);
+        res.redirect(`${app.locals.base}/sensors.html?id=${sensorContent.id}`)
+      }
+      catch(err){
+        console.error(err);
+      }
     }
-    catch(err){
-      console.error(err);
+    if(errors){
+      const addSensorErrorWidgetDef = [{
+        name: 'id',
+        label: 'Sensor ID *',
+        type: 'text',
+        value: (`${sensorContent.id}` === undefined) ? '' : `${sensorContent.id}`,
+        classes: ['tst-sensor-id'],
+        errors: ''
+      },
+      {
+        name: 'model',
+        label: 'Model *',
+        type: 'text',
+        value: (`${sensorContent.model}` === undefined) ? '' : `${sensorContent.model}`,
+        classes: ['tst-model'],
+        errors: ''
+      },
+      {
+        name: 'period',
+        label: 'Period *',
+        type: 'text',
+        value: (`${sensorContent.period}` === undefined) ? '' : `${sensorContent.period}`,
+        classes: ['tst-period numeric'],
+        errors: ''
+      },
+      {
+        type: 'interval',
+        name: 'expected',
+        label: 'Expected Range *',
+        value: { min: (`${sensorContent.expected.min}` === undefined) ? '' : `${sensorContent.expected.min}`, 
+                 max: (`${sensorContent.expected.max}` === undefined) ? '' : `${sensorContent.expected.max}`, },
+        classes: [ 'numeric interval' ],
+        errors: ''
+      }];
+
+      for(let i = 0; i < addSensorErrorWidgetDef.length; i++){
+        addSensorErrorWidgetDef[i].errors = errorValidation[addSensorErrorWidgetDef[i].name];
+      }
+      let addSensorWidgetPartial = '';
+
+    for(const widget of addSensorErrorWidgetDef){
+      const view = widgetView(widget, {value: widget.value, error: widget.errors});
+      addSensorWidgetPartial += mustache.render('widget',view);
+    }
+
+    let model = {sensor: true, sensorWidget: addSensorWidgetPartial};
+    const html = mustache.render('add', model);
+    res.send(html);
     }
   };
 };
@@ -558,8 +623,29 @@ function validate(type, value){
           }
         }
       }
-      console.log(errorValidation);
       break;
+    case 'sensors':
+        let sensor_field_info;
+        for(let prop in value){
+          sensor_field_info = sensorField[prop];
+          if(prop !== 'expected'){
+            if(value[prop] === ''){
+              errorValidation[prop] = sensor_field_info.requiredError;
+            }
+            else{
+              delete errorValidation[prop];
+            }
+          }
+          else if(prop === 'expected'){
+            if(value[prop].min === '' || value[prop].max === ''){
+              errorValidation[prop] = sensor_field_info.requiredError;
+            }
+            else{
+              delete errorValidation[prop];
+            }
+          }
+        }
+        break;
   }
   return Object.keys(errorValidation).length > 0 && errorValidation;
 }
