@@ -9,7 +9,7 @@
         </li>
         <li>
           <a class="tst-sensor-types-add"
-    	 href="/sensor-types/addSensorType.html">
+    	 href="/sensor-types/add.html">
     	Add Sensor Type
           </a>.
         </li>
@@ -21,7 +21,7 @@
         </li>
         <li>
           <a class="tst-sensors-add"
-    	 href="/sensors/addSensors.html">
+    	 href="/sensors/add.html">
     	Add Sensor
           </a>.
         </li>

@@ -42,29 +42,63 @@ function setUpRoutes(app){
   app.post(`${base}/sensors/add.html`, bodyParser.urlencoded({extended: true}), createUpdateSensors(app));
 }
 
+const sensorTypeField = {
+  id:{
+    regex: /^[a-zA-Z0-9\-\_]+$/,
+    error: "Sensor Type ID field can contain only alphanumerics, '-' or '_' characters"
+  },
+  modelNumber:{
+    regex: /^[a-zA-Z0-9\-\' ]+$/,
+    error: "Model Number field can contain only alphanumerics, '-',' or space"
+  },
+  manufacturer:{
+    regex: /^[a-zA-Z\-\' ]+$/,
+    error: "The Manufacturer field can contain only alphabetics, '-',' or space"
+  }
+};
+
+const sensorField = {
+  id:{
+    regex: /^[a-zA-Z0-9\-\_]+$/,
+    error: "Sensor ID field can contain only alphanumerics, '-' or '_' characters"
+  },
+  model:{
+    regex: /^[a-zA-Z0-9\-\_]+$/,
+    error: "Model field can contain only alphanumerics, '-' or '_' characters"
+  },
+  period:{
+    regex: /^([+-]?[1-9]\d*|0)$/,
+    error: "The Period field must be an integer"
+  }
+};
+
 function searchSensorTypes(app){
   return async function(req,res){
-    let errors = {};
+    let sensorTypeError = '';
+    let displaySummary = true;
     const sensorTypeWidgetDef = [{
       name: 'id',
       label: 'Sensor Type Id',
       type: 'text',
       val: (`${req.query.id}` === 'undefined')?'':`${req.query.id}`,
-      classes: ['tst-sensor-type-id']
+      classes: ['tst-sensor-type-id'],
+      errors: errorModel('sensor-types','id',req.query.id) || ''
     },
     {
       name: 'modelNumber',
       label: 'Model Number',
       type: 'text',
       val: (`${req.query.modelNumber}` === 'undefined')?'':`${req.query.modelNumber}`,
-      classes: ['tst-model-number']
+      classes: ['tst-model-number'],
+      errors: errorModel('sensor-types','modelNumber',req.query.modelNumber) || ''
     },
     {
       name: 'manufacturer',
       label: 'Manufacturer',
       type: 'text',
       val: (`${req.query.manufacturer}` === 'undefined')?'':`${req.query.manufacturer}`,
-      classes: ['tst-manufacturer']
+      classes: ['tst-manufacturer'],
+      errors: errorModel('sensor-types','manufacturer',req.query.manufacturer) || ''
     },
     { 
       type: 'select',
@@ -79,23 +113,39 @@ function searchSensorTypes(app){
       },
       classes: [ 'tst-quantity' ], 
       val: (`${req.query.quantity}` === undefined)?'Select':`${req.query.quantity}`,
+      errors: ''
     }
     ];
+
+    for(let i = 0; i < sensorTypeWidgetDef.length; i++){
+     if(sensorTypeWidgetDef[i].errors !== '')
+      {
+        displaySummary = false;
+      }
+    }
 
     let widgetPartial = '';
 
     for(const widget of sensorTypeWidgetDef){
-      const view = widgetView(widget, {value: widget.val});
+      const view = widgetView(widget, {value: widget.val, error: widget.errors});
       widgetPartial += mustache.render('widget',view);
     }
 
     let sensorTypeData = {};
+    if(displaySummary){
     try{
       sensorTypeData = await app.locals.model.list('sensor-types',req.query); 
     }
     catch(err){
-      console.log(err);
+      console.error(err);
+      sensorTypeError = wsErrors(err);
     }
+
+    if(Object.keys(sensorTypeData).length === 0 && sensorTypeData.constructor === Object){
+      sensorTypeError = 'No results found.'
+      displaySummary = false;
+    }
+  }
 
     let next = '';
     let prev = '';
@@ -113,7 +163,9 @@ function searchSensorTypes(app){
 
     const model = {widget: widgetPartial, sensorTypeData : sensorTypeData.data,
       next: nextFlag ? next : false, 
-      prev: prevFlag ? prev : false};
+      prev: prevFlag ? prev : false,
+      sensorTypeError: sensorTypeError,
+      displaySummary: displaySummary};
     const html = mustache.render('sensor-type',model);
     res.send(html);
   };
@@ -121,42 +173,62 @@ function searchSensorTypes(app){
 
 function searchSensors(app){
   return async function(req,res){
+    let sensorError = '';
+    let displaySummary = true;
     const sensorWidgetDef = [{
       name: 'id',
       label: 'Sensor Id',
       type: 'text',
       val: (`${req.query.id}` === 'undefined')?'':`${req.query.id}`,
-      classes: ['tst-sensor-id']
+      classes: ['tst-sensor-id'],
+      errors: errorModel('sensors','id',req.query.id) || ''
     },
     {
       name: 'model',
       label: 'Model',
       type: 'text',
-      value: (`${req.query.model}` === 'undefined') ? '' : `${req.query.model}`,
-      classes: ['tst-model']
+      val: (`${req.query.model}` === 'undefined') ? '' : `${req.query.model}`,
+      classes: ['tst-model'],
+      errors: errorModel('sensors','model',req.query.model) || ''
     },
     {
       name: 'period',
       label: 'Period',
       type: 'text',
-      value: (`${req.query.period}` === 'undefined') ? '' : `${req.query.period}`,
-      classes: ['tst-period numeric']
+      val: (`${req.query.period}` === 'undefined') ? '' : `${req.query.period}`,
+      classes: ['tst-period numeric'],
+      errors: errorModel('sensors','period',req.query.period) || ''
     }];
+
+    for(let i = 0; i < sensorWidgetDef.length; i++){
+      if(sensorWidgetDef[i].errors !== '')
+       {
+         displaySummary = false;
+       }
+     }
 
     let widgetPartial = '';
 
     for(const widget of sensorWidgetDef){
-      const view = widgetView(widget,{value: widget.val});
+      const view = widgetView(widget,{value: widget.val, error: widget.errors});
       widgetPartial += mustache.render('widget',view);
     }
 
     let sensorData = {};
+
+    if(displaySummary){
     try{
       sensorData = await app.locals.model.list('sensors',req.query); 
     }
     catch(err){
-      console.log(err);
+      console.error(err);
+      sensorError = wsErrors(err);
     }
+    if(Object.keys(sensorData).length === 0 && sensorData.constructor === Object){
+      sensorError = 'No results found.'
+      displaySummary = false;
+    }
+  }
 
     let next = '';
     let prev = '';
@@ -174,7 +246,9 @@ function searchSensors(app){
 
     const model = {widget: widgetPartial, sensorData : sensorData.data,
                   next: nextFlag ? next : false, 
-                  prev: prevFlag ? prev : false};    
+                  prev: prevFlag ? prev : false,
+                  sensorError: sensorError,
+                  displaySummary: displaySummary};    
 
     const html = mustache.render('sensor',model);
     res.send(html);
@@ -243,18 +317,32 @@ function createUpdateSensorTypeForm(app){
 function createUpdateSensorType(app){
   return async function(req,res){
     const sensorTypeContent = clean(req.body);
-    if(sensorTypeContent.quantity === 'temperature'){
-      sensorTypeContent.unit = 'C';
+    switch(sensorTypeContent.qunatity){
+      case 'temperature':
+          sensorTypeContent.unit = 'C';
+          break;
+      case 'pressure':
+          sensorTypeContent.unit = 'PSI';
+          break;
+      case 'flow':
+          sensorTypeContent.unit = 'gpm';
+          break;
+      case 'humidity':
+          sensorTypeContent.unit = '%';
+          break;
     }
-    if(sensorTypeContent.quantity === 'pressure'){
-      sensorTypeContent.unit = 'PSI';
-    }
-    if(sensorTypeContent.quantity === 'flow'){
-      sensorTypeContent.unit = 'gpm';
-    }
-    if(sensorTypeContent.quantity === 'humidity'){
-      sensorTypeContent.unit = '%';
-    }
+    // if(sensorTypeContent.quantity === 'temperature'){
+    //   sensorTypeContent.unit = 'C';
+    // }
+    // if(sensorTypeContent.quantity === 'pressure'){
+    //   sensorTypeContent.unit = 'PSI';
+    // }
+    // if(sensorTypeContent.quantity === 'flow'){
+    //   sensorTypeContent.unit = 'gpm';
+    // }
+    // if(sensorTypeContent.quantity === 'humidity'){
+    //   sensorTypeContent.unit = '%';
+    // }
     try{
       await app.locals.model.update('sensor-types',sensorTypeContent);
       res.redirect(`${app.locals.base}/sensor-types.html?id=${sensorTypeContent.id}`)
@@ -337,5 +425,29 @@ function clean(value){
   }
   out = Object.assign(out,value);
   return out;
+}
+
+function errorModel(type, name, value){
+  let errorMsg = '';
+  let field_info = {};
+  if(value === undefined || value === '') {
+    return errorMsg;
+  }
+  switch(type){
+    case 'sensor-types':
+      field_info = sensorTypeField[name];
+      //console.log(field_info);
+      if(!value.match(field_info.regex)){
+        errorMsg = field_info.error;
+      }
+      break;
+    case 'sensors':
+      field_info = sensorField[name];
+      if(!value.match(field_info.regex)){
+        errorMsg = field_info.error;
+      }
+      break;
+  }
+  return errorMsg;
 }
 
