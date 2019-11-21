@@ -22,6 +22,11 @@
     {{#sensor}}
       <div class="page">
         <h1 class="tst-sensors-add-page">Create/Update Sensors</h1>
+        {{#sensorError}}
+          <ul>
+            <li class = "error">{{sensorError}}</li>
+          </ul>
+        {{/sensorError}}
         <form method = "POST">
           {{{sensorWidget}}}
           <label>&nbsp;</label><input type="submit" value="Add">
