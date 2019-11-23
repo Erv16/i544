@@ -2,5 +2,27 @@ Name:		Erwin Joshua Palani
 B-Number:	B00755963
 Email:		epalani1@binghamton.edu
 
-Add text here as needed.
+To run the project use the following commad:
+./index.js 2346 http://zdu.binghamton.edu:2345
+
+For implementation of this project, made use of the already running 
+instance at http://zdu.binghamton.edu:2345
+
+The functionality of the project is similar to the sample solution
+provided. Successfully tested for most of the test cases, input
+validations and error handling.
+
+A couple of changes implemented as compared to the provided sample solution:
+1. In the search Sensor Type and Sensor pages, if an invalid Sensor Type ID or
+ Sensor ID is provided, then the web service error is displayed eg. 
+ 'no results for sensor-type id xyz' as opposed to the error message
+ 'No results found.' that shows up in the sample solution.
+
+2. Another case of validation that is slightly different from the sample 
+ solution provided is that for the limits[min, max] and expected[min, max]
+ fields in the Add Sensor Types and Add Sensor pages, the current project
+ implementation enforces the user to input both the min and max values for
+ the fileds in both cases(limits and expected) before validating the the
+ provided values.
+
 

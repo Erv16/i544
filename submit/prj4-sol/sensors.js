@@ -109,11 +109,12 @@ let errorValidation = [];
 
 function searchSensorTypes(app){
   return async function(req,res){
+
     let sensorTypeError = '';
     let displaySummary = true;
     const sensorTypeWidgetDef = [{
       name: 'id',
-      label: 'Sensor Type Id',
+      label: 'Sensor Type ID',
       type: 'text',
       val: (`${req.query.id}` === 'undefined')?'':`${req.query.id}`,
       classes: ['tst-sensor-type-id'],
@@ -173,12 +174,14 @@ function searchSensorTypes(app){
     }
     catch(err){
       console.error(err);
-      sensorTypeError = wsErrors(err);
-    }
-
-    if(Object.keys(sensorTypeData).length === 0 && sensorTypeData.constructor === Object){
-      sensorTypeError = 'No results found.'
-      displaySummary = false;
+      let errorMsg = wsErrors(err);
+      if(req.query.id === ''){
+        sensorTypeError = '';
+      }
+      else if(req.query.id !== ''){
+        sensorTypeError = errorMsg['_'][0];
+        displaySummary = false;
+      }
     }
   }
 
@@ -257,11 +260,14 @@ function searchSensors(app){
     }
     catch(err){
       console.error(err);
-      sensorError = wsErrors(err);
-    }
-    if(Object.keys(sensorData).length === 0 && sensorData.constructor === Object){
-      sensorError = 'No results found.'
-      displaySummary = false;
+      let errorMsg = wsErrors(err);
+      if(req.query.id === ''){
+        sensorError = '';
+      }
+      else if(req.query.id !== ''){
+        sensorError = errorMsg['_'][0];
+        displaySummary = false;
+      }
     }
   }
 
@@ -319,7 +325,7 @@ function createUpdateSensorTypeForm(app){
     {
       type: 'select',
       name: 'quantity',
-      label: 'Measure',
+      label: 'Measure *',
       choices: {
         '': 'Select',
         temperature: 'Temperature',
@@ -355,7 +361,7 @@ function createUpdateSensorTypeForm(app){
 
 function createUpdateSensorType(app){
   return async function(req,res){
-
+    let addSensorTypeError = '';
     const sensorTypeContent = req.body;
     let errors = validate('sensor-types',sensorTypeContent);
     if(!errors){
@@ -379,6 +385,8 @@ function createUpdateSensorType(app){
       }
       catch(err){
         console.error(err);
+        let errorMsg = wsErrors(err);
+        addSensorWidgetPartial = errorMsg['_'][0];
       }
     }
     if(errors){
@@ -409,7 +417,7 @@ function createUpdateSensorType(app){
       {
         type: 'select',
         name: 'quantity',
-        label: 'Measure',
+        label: 'Measure *',
         choices: {
           '': 'Select',
           temperature: 'Temperature',
@@ -497,15 +505,16 @@ function createUpdateSensors(app){
   return async function(req,res){
     const sensorContent = req.body;
     let errors = validate('sensors',sensorContent);
-    let sensorError = await validateSensorType(app,sensorContent);
+    let sensorError = '';
     if(!errors && !sensorError){
       try{
         await app.locals.model.update('sensors',sensorContent);
         res.redirect(`${app.locals.base}/sensors.html?id=${sensorContent.id}`)
       }
       catch(err){
-        console.error('!errors',err);
-        sensorError = wsErrors(err);
+        console.error(err);
+        let errorMsg = wsErrors(err);
+        sensorError = errorMsg['_'][0];
       }
     }
     if(errors || sensorError){
@@ -560,21 +569,12 @@ function createUpdateSensors(app){
   };
 };
 
+/******************** Utilities ***********************/
+
 function wsErrors(err){
-  const msg = (err.message) ? err.message : 'web service error';
+  const msg = (err.errors[0].message) ? err.errors[0].message : 'Web Service Error';
   console.error(msg);
   return { _: [ msg ] };
-}
-
-function clean(value){
-  let out = {};
-  for(let propName in value){
-    if(value[propName] === null || value[propName] === undefined || value[propName] === ''){
-      delete value[propName];
-    }
-  }
-  out = Object.assign(out,value);
-  return out;
 }
 
 function errorModel(type, name, value){
@@ -586,7 +586,6 @@ function errorModel(type, name, value){
   switch(type){
     case 'sensor-types':
       field_info = sensorTypeField[name];
-      //console.log(field_info);
       if(!value.match(field_info.regex)){
         errorMsg = field_info.error;
       }
@@ -652,6 +651,14 @@ function validate(type, value){
             if(value[prop] === ''){
               errorValidation[prop] = sensor_field_info.requiredError;
             }
+            else if(value[prop] !== ''){
+              if(!value[prop].match(sensor_field_info.regex)){
+                errorValidation[prop] = sensor_field_info.error;
+              }
+              else{
+                delete errorValidation[prop];
+              }
+            }
             else{
               delete errorValidation[prop];
             }
@@ -659,6 +666,17 @@ function validate(type, value){
           else if(prop === 'expected'){
             if(value[prop].min === '' || value[prop].max === ''){
               errorValidation[prop] = sensor_field_info.requiredError;
+            }
+            else if(value[prop].min !== '' || value[prop].max !== ''){
+              if(!value[prop].min.match(sensor_field_info.min.regex)){
+                errorValidation[prop] = sensor_field_info.min.error;
+              }
+              else if(!value[prop].max.match(sensor_field_info.max.regex)){
+                errorValidation[prop] = sensor_field_info.max.error;
+              }
+              else{
+                delete errorValidation[prop];
+              }
             }
             else{
               delete errorValidation[prop];
@@ -669,30 +687,3 @@ function validate(type, value){
   }
   return Object.keys(errorValidation).length > 0 && errorValidation;
 }
-
-async function validateSensorType(app,value){
-  let errorMsg = '';
-  let validSensorType = {};
-  try{
-    validSensorType  = await app.locals.model.list('sensor-types',{id: value.model});
-  }
-  catch(err){
-    console.error('errors',err);
-    errorMsg = wsErrors(err);
-  }
-  if(Object.keys(validSensorType).length === 0 && validSensorType.constructor === Object){
-    errorMsg = 'No results found.';
-  }
-  if(Object.keys(validSensorType).length > 0){
-    if(value.expected.min < validSensorType.data[0].limits.min){
-      errorMsg = 'RANGE: min value '+`${value.expected.min}`+' outside sensor type limits [' +
-                  `${validSensorType.data[0].limits.min}`+','+`${validSensorType.data[0].limits.max}`+'].';
-    }
-    if(value.expected.max > validSensorType.data[0].limits.max){
-      errorMsg = 'RANGE: max value '+`${value.expected.max}`+' outside sensor type limits [' +
-                  `${validSensorType.data[0].limits.min}`+','+`${validSensorType.data[0].limits.max}`+'].';
-    }
-  }
-  return errorMsg;
-}
-

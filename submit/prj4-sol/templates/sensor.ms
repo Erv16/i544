@@ -7,14 +7,15 @@
   <body>
     <div class="page">
     <h1 class="tst-sensors-search-page">Search Sensors</h1>
-    {{#sensorError}}
-      <ul>
-        <li class="error">{{sensorError}}</li>
-      </ul>
-    {{/sensorError}}
      <form method = "GET">
+      {{#sensorError}}
+        <p></p>
+        <ul>
+          <li class="error">{{sensorError}}</li>
+        </ul>
+      {{/sensorError}}
         {{{widget}}}
-      <label>&nbsp;</label><input type="submit" value="search">
+      <label>&nbsp;</label><input type="submit" value="Search">
       </form>
     </div>
     {{#displaySummary}}

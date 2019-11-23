@@ -7,14 +7,15 @@
   <body>
     <div class = "page">
       <h1 class="tst-sensor-types-search-page">Search Sensor Types</h1>
-      {{#sensorTypeError}}
+      <form method = "GET">
+        {{#sensorTypeError}}
+         <p></p>
         <ul>
           <li class="error">{{sensorTypeError}}</li>
         </ul>
-      {{/sensorTypeError}}
-      <form method = "GET">
+        {{/sensorTypeError}}
         {{{widget}}}
-      <label>&nbsp;</label><input type="submit" value="search">
+      <label>&nbsp;</label><input type="submit" value="Search">
       </form>
     </div>
     {{#displaySummary}}
@@ -25,7 +26,7 @@
                     <th>Manufacturer</th>
                     <th>Sensor Type ID</th>
                     <th>Model Number</th>
-                    <th>Measure</th>
+                    <th>Quantity</th>
                     <th colspan="2">Limits</th>
           </tr>
           <tr>
@@ -62,5 +63,6 @@
       {{/next}}
     </div>
     {{>footer}}
+    
   </body>
 </html>
