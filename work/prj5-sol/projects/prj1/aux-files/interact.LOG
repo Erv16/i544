@@ -1,0 +1,448 @@
+#set a convenience shell variable to point to data dir
+$ DATA=$HOME/cs544/data
+
+#show usage message when invoked without arguments
+$ ./index.js 
+usage: index.js DATA_DIR [SENSOR_TYPES_JSON SENSORS_JSON SENSOR_DATA_JSON]
+
+#run it with large data files from data dir; prints help message on startup.
+$ ./index.js $DATA sensor-types.json sensors.json sensor-data.json
+add   sensor-type|sensor|sensor-data NAME=VALUE...
+clear clear all sensor data
+find  sensor-type|sensor|sensor-data NAME=VALUE...
+help  output this message
+load  sensor-type|sensor|sensor-data JSON_FILE
+
+#show up to 5 (from default value for count) sensor-types.
+>> find sensor-type
+{
+  "nextIndex": 5,
+  "data": [
+    {
+      "id": "ge-f26x",
+      "manufacturer": "General Electric",
+      "modelNumber": "F26x",
+      "quantity": "flow",
+      "unit": "gpm",
+      "limits": {
+        "min": 0,
+        "max": 200
+      }
+    },
+    {
+      "id": "ge-h47a",
+      "manufacturer": "General Electric",
+      "modelNumber": "H47A",
+      "quantity": "humidity",
+      "unit": "%",
+      "limits": {
+        "min": 0,
+        "max": 120
+      }
+    },
+    {
+      "id": "ge-p92b",
+      "manufacturer": "General Electric",
+      "modelNumber": "P92B",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 10,
+        "max": 200
+      }
+    },
+    {
+      "id": "ge-t37c",
+      "manufacturer": "General Electric",
+      "modelNumber": "T37C",
+      "quantity": "temperature",
+      "unit": "C",
+      "limits": {
+        "min": 100,
+        "max": 800
+      }
+    },
+    {
+      "id": "hw-f754jk",
+      "manufacturer": "Honeywell",
+      "modelNumber": "F754JK",
+      "quantity": "flow",
+      "unit": "gpm",
+      "limits": {
+        "min": 0,
+        "max": 30
+      }
+    }
+  ]
+}
+
+#use nextIndex from previous result to show next 2 sensor-types
+>> find sensor-type index=5 count=2
+{
+  "nextIndex": 7,
+  "data": [
+    {
+      "id": "hw-h254j",
+      "manufacturer": "Honeywell",
+      "modelNumber": "H254J",
+      "quantity": "humidity",
+      "unit": "%",
+      "limits": {
+        "min": 0,
+        "max": 120
+      }
+    },
+    {
+      "id": "hw-p443jk",
+      "manufacturer": "Honeywell",
+      "modelNumber": "P443JK",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 0.5,
+        "max": 50
+      }
+    }
+  ]
+}
+
+#show sensor-types for sensing pressure
+>> find sensor-type quantity=pressure
+{
+  "nextIndex": -1,
+  "data": [
+    {
+      "id": "ge-p92b",
+      "manufacturer": "General Electric",
+      "modelNumber": "P92B",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 10,
+        "max": 200
+      }
+    },
+    {
+      "id": "hw-p443jk",
+      "manufacturer": "Honeywell",
+      "modelNumber": "P443JK",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 0.5,
+        "max": 50
+      }
+    }
+  ]
+}
+
+#show up to 5 (from default value for count) sensors.
+>> find sensor
+{
+  "nextIndex": 5,
+  "data": [
+    {
+      "id": "233y",
+      "model": "ge-t37c",
+      "period": 93,
+      "expected": {
+        "min": 190,
+        "max": 755
+      }
+    },
+    {
+      "id": "234k",
+      "model": "ge-p92b",
+      "period": 5,
+      "expected": {
+        "min": 20,
+        "max": 159
+      }
+    },
+    {
+      "id": "2356",
+      "model": "ge-h47a",
+      "period": 23,
+      "expected": {
+        "min": 23,
+        "max": 102
+      }
+    },
+    {
+      "id": "235s",
+      "model": "ge-f26x",
+      "period": 77,
+      "expected": {
+        "min": 29,
+        "max": 134
+      }
+    },
+    {
+      "id": "236e",
+      "model": "hw-t42k",
+      "period": 77,
+      "expected": {
+        "min": -10,
+        "max": 131
+      }
+    }
+  ]
+}
+
+#show up to 2 model hw-t42k sensors
+>> find sensor model=hw-t42k count=2
+{
+  "nextIndex": 13,
+  "data": [
+    {
+      "id": "236e",
+      "model": "hw-t42k",
+      "period": 77,
+      "expected": {
+        "min": -10,
+        "max": 131
+      }
+    },
+    {
+      "id": "23ba",
+      "model": "hw-t42k",
+      "period": 95,
+      "expected": {
+        "min": -37,
+        "max": 119
+      }
+    }
+  ]
+}
+
+#use lastIndex from previous result to see next 2 sensors
+>> find sensor model=hw-t42k count=2 index=13
+{
+  "nextIndex": 29,
+  "data": [
+    {
+      "id": "23g6",
+      "model": "hw-t42k",
+      "period": 13,
+      "expected": {
+        "min": -28,
+        "max": 67
+      }
+    },
+    {
+      "id": "23l2",
+      "model": "hw-t42k",
+      "period": 10,
+      "expected": {
+        "min": -23,
+        "max": 106
+      }
+    }
+  ]
+}
+
+#sensor-data search must specify sensorId for sensor whose data is requested
+>> find sensor-data
+missing value for sensorId
+
+#show up to 2 latest readings for sensor 23g6
+>> find sensor-data sensorId=23g6 count=2
+{
+  "data": [
+    {
+      "timestamp": 1567217758561,
+      "value": 63.9,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758548,
+      "value": 11.3,
+      "status": "ok"
+    }
+  ]
+}
+
+#show above results but also show sensor and sensor-type info
+>> find sensor-data sensorId=23g6 count=2 doDetail=true
+{
+  "data": [
+    {
+      "timestamp": 1567217758561,
+      "value": 63.9,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758548,
+      "value": 11.3,
+      "status": "ok"
+    }
+  ],
+  "sensorType": {
+    "id": "hw-t42k",
+    "manufacturer": "Honeywell",
+    "modelNumber": "T42K",
+    "quantity": "temperature",
+    "unit": "C",
+    "limits": {
+      "min": -40,
+      "max": 140
+    }
+  },
+  "sensor": {
+    "id": "23g6",
+    "model": "hw-t42k",
+    "period": 13,
+    "expected": {
+      "min": -28,
+      "max": 67
+    }
+  }
+}
+
+#look for results which are outOfRange; note that expected values
+#for 23g6 are in [-28, 67].
+>> find sensor-data sensorId=23g6 statuses=outOfRange count=2
+{
+  "data": [
+    {
+      "timestamp": 1567217758483,
+      "value": 70,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217758457,
+      "value": 69,
+      "status": "outOfRange"
+    }
+  ]
+}
+
+#starting from timestamp < first timestamp above, look for more readings.
+#this is how it is possible to scroll through the data.
+#note that the last result above becomes the first result below.
+#(note line break for formatting)
+>> find sensor-data sensorId=23g6 statuses=outOfRange count=2
+        timestamp=1567217758482
+{
+  "data": [
+    {
+      "timestamp": 1567217758457,
+      "value": 69,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217758418,
+      "value": 69,
+      "status": "outOfRange"
+    }
+  ]
+}
+
+
+>>#starting from first timestamp above look for results with status ok
+#or outOfRange
+>> find sensor-data sensorId=23g6 statuses=outOfRange|ok count=2
+        timestamp=1567217758457
+{
+  "data": [
+    {
+      "timestamp": 1567217758457,
+      "value": 69,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217758444,
+      "value": 25.6,
+      "status": "ok"
+    }
+  ]
+}
+
+#look for error status: note that limits for sensor 23g6,
+#model hw-t42k are [-40, 140].
+>> find sensor-data sensorId=23g6 statuses=error count=2 timestamp=1567217758456
+{
+  "data": [
+    {
+      "timestamp": 1567217758340,
+      "value": -41,
+      "status": "error"
+    },
+    {
+      "timestamp": 1567217757963,
+      "value": -42,
+      "status": "error"
+    }
+  ]
+}
+
+#no results before the beginning of time (Jan 1, 1970 00:00:00 UTC).
+>> find sensor-data sensorId=23g6 timestamp=-1
+{
+  "data": []
+}
+
+#error for bad id's
+>> find sensor-data sensorId=23g4
+unknown sensor id "23g4"
+>> find sensor id=99
+cannot find sensor for id "99"
+>> find sensor-type id=99
+cannot find sensor-type for id "99"
+
+#manually add some data: typed on a single line
+#(note that the CLI does not allow values in name=value to contain whitespace)
+>> add sensor-type id=tq-x24a
+       manufacturer=TeleQuant
+       modelNumber=x24a
+       quantity=current
+       unit=A
+       limits.min=1 limits.max=100
+       
+>> find sensor-type quantity=current
+{
+  "nextIndex": -1,
+  "data": [
+    {
+      "id": "tq-x24a",
+      "manufacturer": "TeleQuant",
+      "modelNumber": "x24a",
+      "quantity": "current",
+      "unit": "A",
+      "limits": {
+        "min": 1,
+        "max": 100
+      }
+    }
+  ]
+}
+
+#load command
+>> load
+load requires arg sensor-type|sensor|sensor-data and JSON file name
+add   sensor-type|sensor|sensor-data NAME=VALUE...
+clear clear all sensor data
+find  sensor-type|sensor|sensor-data NAME=VALUE...
+help  output this message
+load  sensor-type|sensor|sensor-data JSON_FILE
+
+#load sensor-type json file with errors
+>> load sensor-type err-sensor-types.json
+err-sensor-types.json: record: 1: missing value for id
+err-sensor-types.json: record: 1: missing value for quantity
+err-sensor-types.json: record: 1: value 100x for limits.min is not a number
+
+#load sensors json file with errors
+>> load sensor err-sensors.json
+err-sensors.json: record: 1: missing value for id
+err-sensors.json: record: 1: value 93.0 for period is not an integer
+err-sensors.json: record: 1: value 755x for expected.max is not a number
+
+#load sensor-data json file with errors
+>> load sensor-data err-sensor-data.json
+err-sensor-data.json: record: 1: missing value for sensorId
+err-sensor-data.json: record: 1: value 1567217758561.0 for timestamp is not an integer
+err-sensor-data.json: record: 2: value 1567217758561.AA for timestamp is not an integer
+
+#type ^D to exit program
+>> $

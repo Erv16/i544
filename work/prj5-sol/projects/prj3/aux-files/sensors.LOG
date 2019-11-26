@@ -1,0 +1,635 @@
+#set up data dir
+$ DATA=$HOME/cs544/data/sensors
+
+#start server in background; record its PID in .pid file
+$  ./index.js 2345 mongodb://localhost:27017/sensors \
+      $DATA/sensor-types.json \
+      $DATA/sensors.json \
+      $DATA/sensor-data.json & \
+   echo $! > .pid
+[17] 12030
+$ listening on port 2345
+
+$ cat .pid
+12030
+
+#since server will report errors on terminal via stderr, avoid confusion
+#by interacting with server in a new terminal
+
+# use curl to get sensor-types; --silent turns off progress
+# indicator; json_pp pretty-prints.
+$ curl --silent 'http://localhost:2345/sensor-types' | json_pp 
+{
+   "previousIndex" : 0,
+   "self" : "http://localhost:2345/sensor-types",
+   "nextIndex" : 5,
+   "data" : [
+      {
+         "manufacturer" : "General Electric",
+         "id" : "ge-f26x",
+         "limits" : {
+            "max" : 200,
+            "min" : 0
+         },
+         "unit" : "gpm",
+         "self" : "http://localhost:2345/sensor-types/ge-f26x",
+         "quantity" : "flow",
+         "modelNumber" : "F26x"
+      },
+      {
+         "self" : "http://localhost:2345/sensor-types/ge-h47a",
+         "unit" : "%",
+         "modelNumber" : "H47A",
+         "quantity" : "humidity",
+         "id" : "ge-h47a",
+         "manufacturer" : "General Electric",
+         "limits" : {
+            "max" : 120,
+            "min" : 0
+         }
+      },
+      {
+         "manufacturer" : "General Electric",
+         "id" : "ge-p92b",
+         "limits" : {
+            "min" : 10,
+            "max" : 200
+         },
+         "self" : "http://localhost:2345/sensor-types/ge-p92b",
+         "unit" : "PSI",
+         "quantity" : "pressure",
+         "modelNumber" : "P92B"
+      },
+      {
+         "self" : "http://localhost:2345/sensor-types/ge-t37c",
+         "unit" : "C",
+         "modelNumber" : "T37C",
+         "quantity" : "temperature",
+         "id" : "ge-t37c",
+         "manufacturer" : "General Electric",
+         "limits" : {
+            "min" : 100,
+            "max" : 800
+         }
+      },
+      {
+         "manufacturer" : "Honeywell",
+         "id" : "hw-f754jk",
+         "limits" : {
+            "min" : 0,
+            "max" : 30
+         },
+         "self" : "http://localhost:2345/sensor-types/hw-f754jk",
+         "unit" : "gpm",
+         "quantity" : "flow",
+         "modelNumber" : "F754JK"
+      }
+   ],
+   "next" : "http://localhost:2345/sensor-types?_index=5"
+}
+
+#use next link to get next two sensor-types
+$ curl --silent 'http://localhost:2345/sensor-types?_index=5&_count=2' | \
+    json_pp 
+{
+   "self" : "http://localhost:2345/sensor-types?_index=5&_count=2",
+   "data" : [
+      {
+         "modelNumber" : "H254J",
+         "quantity" : "humidity",
+         "manufacturer" : "Honeywell",
+         "id" : "hw-h254j",
+         "unit" : "%",
+         "limits" : {
+            "max" : 120,
+            "min" : 0
+         },
+         "self" : "http://localhost:2345/sensor-types/hw-h254j"
+      },
+      {
+         "limits" : {
+            "min" : 0.5,
+            "max" : 50
+         },
+         "unit" : "PSI",
+         "self" : "http://localhost:2345/sensor-types/hw-p443jk",
+         "id" : "hw-p443jk",
+         "manufacturer" : "Honeywell",
+         "modelNumber" : "P443JK",
+         "quantity" : "pressure"
+      }
+   ],
+   "nextIndex" : 7,
+   "next" : "http://localhost:2345/sensor-types?_index=7&_count=2",
+   "prev" : "http://localhost:2345/sensor-types?_index=3&_count=2",
+   "previousIndex" : 3
+}
+
+#use prev link to go backwards
+$ curl --silent 'http://localhost:2345/sensor-types?_index=3&_count=2' | \
+   json_pp 
+{
+   "self" : "http://localhost:2345/sensor-types?_index=3&_count=2",
+   "data" : [
+      {
+         "quantity" : "temperature",
+         "modelNumber" : "T37C",
+         "self" : "http://localhost:2345/sensor-types/ge-t37c",
+         "manufacturer" : "General Electric",
+         "id" : "ge-t37c",
+         "unit" : "C",
+         "limits" : {
+            "min" : 100,
+            "max" : 800
+         }
+      },
+      {
+         "self" : "http://localhost:2345/sensor-types/hw-f754jk",
+         "quantity" : "flow",
+         "modelNumber" : "F754JK",
+         "limits" : {
+            "max" : 30,
+            "min" : 0
+         },
+         "manufacturer" : "Honeywell",
+         "unit" : "gpm",
+         "id" : "hw-f754jk"
+      }
+   ],
+   "prev" : "http://localhost:2345/sensor-types?_index=1&_count=2",
+   "nextIndex" : 5,
+   "next" : "http://localhost:2345/sensor-types?_index=5&_count=2",
+   "previousIndex" : 1
+}
+
+# use self link for last sensor-type above to get it
+$ curl --silent http://localhost:2345/sensor-types/hw-f754jk | json_pp
+{
+   "data" : [
+      {
+         "unit" : "gpm",
+         "self" : "http://localhost:2345/sensor-types/hw-f754jk",
+         "manufacturer" : "Honeywell",
+         "modelNumber" : "F754JK",
+         "id" : "hw-f754jk",
+         "limits" : {
+            "min" : 0,
+            "max" : 30
+         },
+         "quantity" : "flow"
+      }
+   ],
+   "nextIndex" : -1,
+   "self" : "http://localhost:2345/sensor-types/hw-f754jk",
+   "previousIndex" : -1
+}
+
+# Specify unknown id for sensor-type.
+$ curl --silent http://localhost:2345/sensor-types/hw-f754jxk | json_pp
+{
+   "errors" : [
+      {
+         "message" : "no results for sensor-type id 'hw-f754jxk'",
+         "code" : "NOT_FOUND"
+      }
+   ]
+}
+
+# Show HTTP status code when given an unknown id
+$ curl --silent -w "%{http_code}\n" --output /dev/null \
+    'http://localhost:2345/sensor-types/hw-f754jxk'
+404
+
+# Same result when id is specified as a query parameter
+$ curl --silent  'http://localhost:2345/sensor-types?id=hw-f754jxk' | json_pp
+{
+   "errors" : [
+      {
+         "code" : "NOT_FOUND",
+         "message" : "no results for sensor-type id 'hw-f754jxk'"
+      }
+   ]
+}
+
+# create a new sensor-type:
+#   --include shows response headers.
+#   --request specifies HTTP method
+#   --header sets a request header
+#   --data provides request body
+# note Location response header gives url of newly created resource
+$ curl --include \
+       --request POST \
+       --header 'Content-Type: application/json' \
+       --data '{"id":"ibm-f26x","manufacturer":"IBM","modelNumber":"F26x","quantity":"flow","unit":"gpm","limits":{"min":0,"max":200}}' \
+       http://localhost:2345/sensor-types
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Location: http://localhost:2345/sensor-types/ibm-f26x
+Content-Type: text/plain; charset=utf-8
+Content-Length: 7
+ETag: W/"7-rM9AyJuqT6iOan/xHh+AW+7K/T8"
+Date: Wed, 16 Oct 2019 22:56:56 GMT
+Connection: keep-alive
+
+Created
+
+#get newly created resource
+$ curl --silent http://localhost:2345/sensor-types/ibm-f26x | json_pp
+{
+   "self" : "http://localhost:2345/sensor-types/ibm-f26x",
+   "nextIndex" : -1,
+   "previousIndex" : -1,
+   "data" : [
+      {
+         "modelNumber" : "F26x",
+         "manufacturer" : "IBM",
+         "quantity" : "flow",
+         "self" : "http://localhost:2345/sensor-types/ibm-f26x",
+         "id" : "ibm-f26x",
+         "unit" : "gpm",
+         "limits" : {
+            "max" : 200,
+            "min" : 0
+         }
+      }
+   ]
+}
+
+# search for newly created resource using a filter
+$ curl --silent http://localhost:2345/sensor-types?manufacturer=IBM | json_pp
+{
+   "self" : "http://localhost:2345/sensor-types?manufacturer=IBM",
+   "previousIndex" : 0,
+   "data" : [
+      {
+         "modelNumber" : "F26x",
+         "limits" : {
+            "min" : 0,
+            "max" : 200
+         },
+         "unit" : "gpm",
+         "quantity" : "flow",
+         "id" : "ibm-f26x",
+         "self" : "http://localhost:2345/sensor-types/ibm-f26x",
+         "manufacturer" : "IBM"
+      }
+   ],
+   "nextIndex" : -1
+}
+
+# search for particular model of sensors
+$ $ curl --silent 'http://localhost:2345/sensors?model=ge-f26x&_count=2' | json_pp
+{
+   "data" : [
+      {
+         "period" : 77,
+         "expected" : {
+            "min" : 29,
+            "max" : 134
+         },
+         "id" : "235s",
+         "model" : "ge-f26x",
+         "self" : "http://localhost:2345/sensors/235s"
+      },
+      {
+         "expected" : {
+            "min" : 16,
+            "max" : 139
+         },
+         "id" : "23ao",
+         "period" : 20,
+         "model" : "ge-f26x",
+         "self" : "http://localhost:2345/sensors/23ao"
+      }
+   ],
+   "previousIndex" : 0,
+   "next" : "http://localhost:2345/sensors?model=ge-f26x&_count=2&_index=2",
+   "self" : "http://localhost:2345/sensors?model=ge-f26x&_count=2",
+   "nextIndex" : 2
+}
+
+# include sensorType detail for each sensor data item
+$ curl --silent 'http://localhost:2345/sensors?_count=2&_doDetail=true' | \
+   json_pp
+{
+   "self" : "http://localhost:2345/sensors?_count=2&_doDetail=true",
+   "previousIndex" : 0,
+   "next" : "http://localhost:2345/sensors?_count=2&_doDetail=true&_index=2",
+   "data" : [
+      {
+         "id" : "233y",
+         "period" : 93,
+         "sensorType" : {
+            "id" : "ge-t37c",
+            "limits" : {
+               "max" : 800,
+               "min" : 100
+            },
+            "manufacturer" : "General Electric",
+            "modelNumber" : "T37C",
+            "unit" : "C",
+            "quantity" : "temperature"
+         },
+         "self" : "http://localhost:2345/sensors/233y",
+         "expected" : {
+            "min" : 190,
+            "max" : 755
+         },
+         "model" : "ge-t37c"
+      },
+      {
+         "period" : 5,
+         "id" : "234k",
+         "sensorType" : {
+            "id" : "ge-p92b",
+            "manufacturer" : "General Electric",
+            "limits" : {
+               "max" : 200,
+               "min" : 10
+            },
+            "modelNumber" : "P92B",
+            "unit" : "PSI",
+            "quantity" : "pressure"
+         },
+         "expected" : {
+            "min" : 20,
+            "max" : 159
+         },
+         "self" : "http://localhost:2345/sensors/234k",
+         "model" : "ge-p92b"
+      }
+   ],
+   "nextIndex" : 2
+}
+
+# we get empty results if we filter using a non-existent property
+$ curl --silent 'http://localhost:2345/sensors?_count=2&_doDetail=true&xx=22' \
+   | json_pp
+{
+   "data" : [],
+   "previousIndex" : 0,
+   "nextIndex" : -1,
+   "self" : "http://localhost:2345/sensors?_count=2&_doDetail=true&xx=22"
+}
+
+#Show all sensors with period=23
+$ curl --silent  'http://localhost:2345/sensors?period=23' | json_pp
+{
+   "data" : [
+      {
+         "self" : "http://localhost:2345/sensors/2356",
+         "expected" : {
+            "max" : 102,
+            "min" : 23
+         },
+         "model" : "ge-h47a",
+         "period" : 23,
+         "id" : "2356"
+      },
+      {
+         "id" : "23gs",
+         "expected" : {
+            "max" : 47.5,
+            "min" : 17.5
+         },
+         "self" : "http://localhost:2345/sensors/23gs",
+         "period" : 23,
+         "model" : "hw-p443jk"
+      }
+   ],
+   "previousIndex" : 0,
+   "nextIndex" : -1,
+   "self" : "http://localhost:2345/sensors?period=23"
+}
+
+#when we filter by a bad value for a non-id attribute like period,
+#we simply get empty results, not a 404.
+$ curl --silent  'http://localhost:2345/sensors?period=1023' | json_pp
+{
+   "previousIndex" : 0,
+   "self" : "http://localhost:2345/sensors?period=1023",
+   "nextIndex" : -1,
+   "data" : []
+}
+
+# add a sensor
+$ curl --include \
+       --request POST \
+       --header 'Content-Type: application/json' \
+       --data '{"id":"42x","model":"ge-f26x","period":77,"expected":{"min":22,"max":142}}' \
+       http://localhost:2345/sensors
+HTTP/1.1 201 Created
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Location: http://localhost:2345/sensors/42x
+Content-Type: text/plain; charset=utf-8
+Content-Length: 7
+ETag: W/"7-rM9AyJuqT6iOan/xHh+AW+7K/T8"
+Date: Wed, 16 Oct 2019 23:01:18 GMT
+Connection: keep-alive
+
+Created
+
+# get newly added sensor
+$ curl --silent http://localhost:2345/sensors/42x | json_pp
+{
+   "nextIndex" : -1,
+   "self" : "http://localhost:2345/sensors/42x",
+   "data" : [
+      {
+         "id" : "42x",
+         "expected" : {
+            "min" : 22,
+            "max" : 142
+         },
+         "period" : 77,
+         "self" : "http://localhost:2345/sensors/42x",
+         "model" : "ge-f26x"
+      }
+   ],
+   "previousIndex" : -1
+}
+
+# search for sensor by model and period
+$ curl --silent 'http://localhost:2345/sensors?model=ge-f26x&period=77' | json_pp
+{
+   "nextIndex" : -1,
+   "previousIndex" : 0,
+   "data" : [
+      {
+         "period" : 77,
+         "model" : "ge-f26x",
+         "self" : "http://localhost:2345/sensors/235s",
+         "id" : "235s",
+         "expected" : {
+            "min" : 29,
+            "max" : 134
+         }
+      },
+      {
+         "self" : "http://localhost:2345/sensors/42x",
+         "expected" : {
+            "max" : 142,
+            "min" : 22
+         },
+         "id" : "42x",
+         "period" : 77,
+         "model" : "ge-f26x"
+      }
+   ],
+   "self" : "http://localhost:2345/sensors?model=ge-f26x&period=77"
+}
+
+# search for sensor-data for sensor 235s.
+$ curl --silent 'http://localhost:2345/sensor-data/235s' | json_pp
+{
+   "data" : [
+      {
+         "value" : 75,
+         "status" : "ok",
+         "timestamp" : 1567217758484,
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758484"
+      },
+      {
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758407",
+         "timestamp" : 1567217758407,
+         "status" : "ok",
+         "value" : 114.6
+      },
+      {
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758253",
+         "timestamp" : 1567217758253,
+         "status" : "ok",
+         "value" : 37.2
+      },
+      {
+         "value" : 76.6,
+         "status" : "ok",
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758176",
+         "timestamp" : 1567217758176
+      },
+      {
+         "status" : "ok",
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758099",
+         "timestamp" : 1567217758099,
+         "value" : 95.7
+      }
+   ],
+   "self" : "http://localhost:2345/sensor-data/235s"
+}
+
+# use self link for last data above
+$ curl --silent http://localhost:2345/sensor-data/235s/1567217758099 | json_pp
+{
+   "self" : "http://localhost:2345/sensor-data/235s/1567217758099",
+   "data" : [
+      {
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758099",
+         "value" : 95.7,
+         "status" : "ok",
+         "timestamp" : 1567217758099
+      }
+   ],
+   "nextIndex" : -1
+}
+
+# show sensor-data for sensor 235s earlier than specified timestamp
+# for all statuses.
+$ curl --silent 'http://localhost:2345/sensor-data/235s?timestamp=1567217758098&statuses=all' | json_pp
+{
+   "data" : [
+      {
+         "value" : 28,
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758022",
+         "timestamp" : 1567217758022,
+         "status" : "outOfRange"
+      },
+      {
+         "value" : -3,
+         "timestamp" : 1567217757945,
+         "self" : "http://localhost:2345/sensor-data/235s/1567217757945",
+         "status" : "error"
+      },
+      {
+         "status" : "ok",
+         "self" : "http://localhost:2345/sensor-data/235s/1567217757868",
+         "timestamp" : 1567217757868,
+         "value" : 69.7
+      },
+      {
+         "status" : "ok",
+         "self" : "http://localhost:2345/sensor-data/235s/1567217757791",
+         "timestamp" : 1567217757791,
+         "value" : 42.2
+      },
+      {
+         "value" : -4,
+         "self" : "http://localhost:2345/sensor-data/235s/1567217757714",
+         "timestamp" : 1567217757714,
+         "status" : "error"
+      }
+   ],
+   "self" : "http://localhost:2345/sensor-data/235s?timestamp=1567217758098&statuses=all"
+}
+
+
+# return 404 if url not found
+$ curl -w "%{http_code}\n" --silent 'http://localhost:2345/sensor-data/235s/1567217758023'
+{"errors":[{"code":"NOT_FOUND","message":"no data for timestamp '1567217758023'"}]}404
+
+# change out-of-range reading for 1567217758022 to a normal reading
+$ curl \
+       --include \
+       --request POST --header 'Content-Type: application/json' \
+       --data '{"timestamp":1567217758022,"value":44}' \
+       http://localhost:2345/sensor-data/235s
+> > > > HTTP/1.1 201 Created
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Location: http://localhost:2345/sensor-data/235s/1567217758022
+Content-Type: text/plain; charset=utf-8
+Content-Length: 7
+ETag: W/"7-rM9AyJuqT6iOan/xHh+AW+7K/T8"
+Date: Wed, 16 Oct 2019 23:20:05 GMT
+Connection: keep-alive
+
+Created
+
+# get updated data
+$ curl --silent http://localhost:2345/sensor-data/235s/1567217758022 | json_pp
+{
+   "nextIndex" : -1,
+   "data" : [
+      {
+         "timestamp" : 1567217758022,
+         "self" : "http://localhost:2345/sensor-data/235s/1567217758022",
+         "status" : "ok",
+         "value" : 44
+      }
+   ],
+   "self" : "http://localhost:2345/sensor-data/235s/1567217758022"
+}
+
+# bad timestamp results in 404
+$ curl  --silent 'http://localhost:2345/sensor-data/235s/1567217758023' | json_pp
+{
+   "errors" :[ 
+      {
+         "code" : "NOT_FOUND",
+         "message" : "no data for timestamp '1567217758023'"
+      }
+   ]
+}
+
+# show explicit 404 HTTP status code
+$ curl  -w "%{http_code}\n" \
+        -o /dev/null \
+	--silent \
+	'http://localhost:2345/sensor-data/235s/1567217758023'
+404
+
+#back in terminal where server is running
+
+# terminate server
+$ kill `cat .pid`

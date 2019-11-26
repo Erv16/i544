@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 444/544: Project 5</title>
+    
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../.." class="material-icons">house</a></li>
+	<li><a href="../../docs">Docs</a></li>
+	<li><a href="../../exams-quizzes">Exams &amp; Quizzes</a></li>
+	<li><a href="../../exercises">Exercises</a></li>
+	<li><a href="../../hws">Homeworks</a></li>
+	<li><a href="../../misc">Misc</a></li>
+	<li><a href="../../projects">Projects</a></li>
+	<li><a href="../../slides">Slides</a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj5.umt:1:0"><h1 data-coord="prj5.umt:1:0">Project 5</h1><p data-coord="prj5.umt:3:0"><strong data-coord="prj5.umt:3:0">Due</strong>: Dec 4 by 11:59p  <strong data-coord="prj5.umt:3:24">No extensions or late submissions</strong>
+</p><p data-coord="prj5.umt:5:0"><strong data-coord="prj5.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj5.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj5.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p><p data-coord="prj5.umt:9:0">This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  It then provides some
+background information.  Finally, it provides some hints as to how
+those requirements can be met.
+</p><section data-coord="prj5.umt:15:0"><h2 data-coord="prj5.umt:15:0">Aims</h2><p data-coord="prj5.umt:18:0">The aims of this project are as follows:
+</p><ul data-coord="prj5.umt:20:0"><li data-coord="prj5.umt:20:0"><p data-coord="prj5.umt:20:4">To give you experience with programming within the browser.
+</p></li><li data-coord="prj5.umt:22:0"><p data-coord="prj5.umt:22:4">To give you some familiarity with using the <a href="https://reactjs.org" data-coord="prj5.umt:22:75">react.js</a> library.
+</p></li><li data-coord="prj5.umt:25:0"><p data-coord="prj5.umt:25:4">To expose you to using a simple bundling tool.
+</p></li></ul></section><section data-coord="prj5.umt:27:0"><h2 data-coord="prj5.umt:27:0">Virtual Machine Tips</h2><p data-coord="prj5.umt:30:0">If you are doing this project on your VM:
+</p><ul data-coord="prj5.umt:32:0"><li data-coord="prj5.umt:32:0"><p data-coord="prj5.umt:32:4">Since your VM is not accessible except via a ssh-tunnel, you will
+need to run a browser locally on your VM and point it to
+<samp data-coord="prj5.umt:32:135">http://localhost:</samp><em data-coord="prj5.umt:32:158">PORT</em> where <em data-coord="prj5.umt:32:171">PORT</em> is the port on which
+you are running your parcel development server.
+</p></li><li data-coord="prj5.umt:37:0"><p data-coord="prj5.umt:37:4">If you experience issues with your VM, please follow the
+instructions for
+<em data-coord="prj5.umt:37:149"><a href="../../misc/course-vm-setup/course-vm-setup.html#restart" data-coord="prj5.umt:37:149">Restarting your VM</a></em> in the
+<em data-coord="prj5.umt:37:232"><a href="../../misc/course-vm-setup/course-vm-setup.html" data-coord="prj5.umt:37:232">Course VM
+    Setup</a></em> document.
+</p></li></ul></section><section data-coord="prj5.umt:46:0"><h2 data-coord="prj5.umt:46:0">Requirements</h2><p data-coord="prj5.umt:49:0">You must check in a <samp data-coord="prj5.umt:49:20">submit/prj5-sol</samp> directory in your gitlab
+project such that typing <samp data-coord="prj5.umt:49:88">npm ci</samp> within that directory followed
+by <samp data-coord="prj5.umt:49:131">npm start</samp> is sufficient to start up a server running on port
+2347.
+</p><p data-coord="prj5.umt:54:0">Accessing that port using a browser should display a <strong data-coord="prj5.umt:54:53">setup page</strong>
+which contains a form which allows the user to specify the URL at
+which the sensors web services are running (this should default
+to <samp data-coord="prj5.umt:54:199">http://zdu.binghamton.edu:2345</samp>).
+</p><p data-coord="prj5.umt:59:0">Submitting the form on the setup page should display an <strong data-coord="prj5.umt:59:56">app page</strong>.
+This app page should constitute a <em data-coord="prj5.umt:59:102">single-page app</em> which will allow
+the user to access 4 tabs.  These 4 tabs should have the same
+functionality as the <strong data-coord="prj5.umt:59:220">Sensor Types Search</strong>, <strong data-coord="prj5.umt:59:243">Sensor Types Add</strong>,
+<strong data-coord="prj5.umt:59:263">Sensors Search</strong> and <strong data-coord="prj5.umt:59:284">Sensors Add</strong> pages from the previous
+project except:
+</p><ul data-coord="prj5.umt:66:0"><li data-coord="prj5.umt:66:0"><p data-coord="prj5.umt:66:4">Blurring a form field should result in validating the value in
+that field.  This includes validating that the model number
+provided for a sensor specifies a valid sensor type id.
+</p></li><li data-coord="prj5.umt:70:0"><p data-coord="prj5.umt:70:4">Blurring any form field on a search page should lead to the
+search results being updated as per the specified fields,
+provided there are no errors.
+</p><p data-coord="prj5.umt:74:4">Your solution is also subject to the following implementation
+constraints:
+</p><ul data-coord="prj5.umt:77:0"><li data-coord="prj5.umt:77:0"><p data-coord="prj5.umt:77:8">You must use <a href="https://reactjs.org/" data-coord="prj5.umt:77:45">reactjs</a> for setting
+up your UI.
+</p></li><li data-coord="prj5.umt:80:0"><p data-coord="prj5.umt:80:8">You must use <em data-coord="prj5.umt:80:42"><a href="../prj3/prj3.html" data-coord="prj5.umt:80:42">Project 3</a></em> web-services
+(possibly modified) directly from within the browser.
+</p></li><li data-coord="prj5.umt:83:0"><p data-coord="prj5.umt:83:8">You must use <a href="https://github.com/axios/axios" data-coord="prj5.umt:83:55">axios</a> for
+calling the web services.
+</p></li></ul></li></ul></section><section data-coord="prj5.umt:99:0"><h2 data-coord="prj5.umt:99:0">Underlying Web Services</h2><p data-coord="prj5.umt:102:0">You will need a server running the underlying web services at the URL
+specified on the set up page.  Alternatives:
+</p><ol data-coord="prj5.umt:105:0"><li data-coord="prj5.umt:105:0"><p data-coord="prj5.umt:105:4">Deploy your solution to <em data-coord="prj5.umt:105:49"><a href="../prj3/prj3.html" data-coord="prj5.umt:105:49">Project 3</a></em>.
+</p></li><li data-coord="prj5.umt:107:0"><p data-coord="prj5.umt:107:4">Deploy the <em data-coord="prj5.umt:107:30"><a href="../prj3-sol" data-coord="prj5.umt:107:30">provided solution</a></em> to
+<em data-coord="prj5.umt:107:78"><a href="../prj3/prj3.html" data-coord="prj5.umt:107:78">Project 3</a></em>.
+</p></li><li data-coord="prj5.umt:110:0"><p data-coord="prj5.umt:110:4">Use the solution to <em data-coord="prj5.umt:110:45"><a href="../prj3/prj3.html" data-coord="prj5.umt:110:45">Project 3</a></em> running on
+<em data-coord="prj5.umt:110:106"><a href="http://zdu.binghamton.edu:2345" data-coord="prj5.umt:110:106">&lt;http://zdu.binghamton.edu:2345&gt;</a></em>.  This site is accessible only from
+within the CS department network.
+</p></li></ol></section><section data-coord="prj5.umt:116:0"><h2 data-coord="prj5.umt:116:0">Provided Files</h2><p data-coord="prj5.umt:119:0">The <a href="prj5-sol" data-coord="prj5.umt:119:16">prj5-sol</a> directory contains a start for your
+project.  Some of the files provided include:
+</p><dl data-coord="prj5.umt:122:0"><dt data-coord="prj5.umt:122:2"> <a href="prj5-sol/sensors-setup.html" data-coord="prj5.umt:122:32">sensors-setup.html</a> </dt><dd data-coord="prj5.umt:123:0"><p data-coord="prj5.umt:123:4">An entry HTML page which allows you to specify the URL
+at which <em data-coord="prj5.umt:123:93"><a href="../prj3/prj3.html" data-coord="prj5.umt:123:93">Project 3 Web Services</a></em>
+are running.
+</p></dd><dt data-coord="prj5.umt:127:2"> <a href="prj5-sol/sensors-app.html" data-coord="prj5.umt:127:30">sensors-app.html</a> </dt><dd data-coord="prj5.umt:128:0"><p data-coord="prj5.umt:128:4">The only HTML page for your single-page app.
+</p></dd><dt data-coord="prj5.umt:130:2"> <a href="prj5-sol/sensors-app.js?colorize=true" data-coord="prj5.umt:130:42">sensors-app.js</a> </dt><dd data-coord="prj5.umt:131:0"><p data-coord="prj5.umt:131:4">The top-level JavaScript loaded by your app.
+</p></dd><dt data-coord="prj5.umt:133:2"> <a href="prj5-sol/sensors-ws.js?colorize=true" data-coord="prj5.umt:133:41">sensors-ws.js</a> </dt><dd data-coord="prj5.umt:134:0"><p data-coord="prj5.umt:134:4">A wrapper which calls the <em data-coord="prj5.umt:134:55"><a href="../prj3/prj3.html" data-coord="prj5.umt:134:55">Project 3 Web Services</a></em>. 
+</p></dd><dt data-coord="prj5.umt:137:2"> <a href="prj5-sol/components/app.jsx" data-coord="prj5.umt:137:32">components/app.jsx</a> </dt><dd data-coord="prj5.umt:138:0"><p data-coord="prj5.umt:138:4">The top-level <samp data-coord="prj5.umt:138:18">app</samp> React component.
+</p></dd><dt data-coord="prj5.umt:140:2"> <a href="prj5-sol/components/tab.jsx" data-coord="prj5.umt:140:32">components/tab.jsx</a> </dt><dd data-coord="prj5.umt:141:0"><p data-coord="prj5.umt:141:4">The <samp data-coord="prj5.umt:141:8">tab</samp> React component used for displaying tabs.
+</p></dd><dt data-coord="prj5.umt:143:2"> <a href="prj5-sol/styles" data-coord="prj5.umt:143:20">styles</a> </dt><dd data-coord="prj5.umt:144:0"><p data-coord="prj5.umt:144:4">CSS style sheets included by <samp data-coord="prj5.umt:144:33">sensors-app.html</samp> to
+give the app a reasonable look-and-feel.
+</p></dd></dl><p data-coord="prj5.umt:147:0">You may change any of the above as needed.
+</p></section><section data-coord="prj5.umt:149:0"><h2 data-coord="prj5.umt:149:0">Hints</h2><p data-coord="prj5.umt:153:0">The following steps are not prescriptive in that you may choose to ignore
+them as long as you meet all project requirements.
+</p><ol data-coord="prj5.umt:156:0"><li data-coord="prj5.umt:156:0"><p data-coord="prj5.umt:156:4">Read the project requirements thoroughly.   Understand the
+<em data-coord="prj5.umt:156:245"><a href="../../slides/users-app/users-app.pdf" data-coord="prj5.umt:156:245">users app</a></em> covered in
+class.
+</p></li><li data-coord="prj5.umt:163:0"><p data-coord="prj5.umt:163:4">Start your project by creating a <samp data-coord="prj5.umt:163:37">work/prj5-sol</samp> directory.
+Change into that directory and initialize your project
+by running <samp data-coord="prj5.umt:163:138">npm init -y</samp>.  This will create a <samp data-coord="prj5.umt:163:173">package.json</samp>
+file; this file should be committed to your repository.
+</p></li><li data-coord="prj5.umt:168:0"><p data-coord="prj5.umt:168:4">Install necessary dependencies:
+</p><pre data-coord="prj5.umt:171:0">    $ npm install --save-dev parcel-bundler \
+         '@babel/plugin-transform-runtime'
+    $ npm install react axios
+</pre><p data-coord="prj5.umt:176:4">The first command installs development dependencies which includes
+the <a href="https://parceljs.org/" data-coord="prj5.umt:176:104">parcel</a> bundler.  Additionally, we
+need <samp data-coord="prj5.umt:176:147">@babel/plugin-transform-runtime</samp> to translate <samp data-coord="prj5.umt:176:194">async</samp>/<samp data-coord="prj5.umt:176:210">await</samp>.
+</p><p data-coord="prj5.umt:181:4">The second command installs runtime dependencies.
+</p></li><li data-coord="prj5.umt:183:0"><p data-coord="prj5.umt:183:4">Copy in the files you have been provided with:
+</p><pre data-coord="prj5.umt:186:0">    $ cp -r ~/cs544/projects/prj5/prj5-sol/.gitignore \
+            ~/cs544/projects/prj5/prj5-sol/.babelrc \
+	    ~/cs544/projects/prj5/prj5-sol/* .
+</pre><p data-coord="prj5.umt:191:4">The <samp data-coord="prj5.umt:191:8">.gitignore</samp> is set up to ignore <samp data-coord="prj5.umt:191:41">node_modules</samp> as well as the
+<samp data-coord="prj5.umt:191:75">.cache</samp> and <samp data-coord="prj5.umt:191:88">dist</samp> directories created by parcel.
+</p><p data-coord="prj5.umt:194:4">The <samp data-coord="prj5.umt:194:8">.babelrc</samp> file is used for initializing <samp data-coord="prj5.umt:194:49">babel</samp>.
+</p></li><li data-coord="prj5.umt:196:0"><p data-coord="prj5.umt:196:4">Add the following <samp data-coord="prj5.umt:196:22">start</samp> script to the <samp data-coord="prj5.umt:196:44">scripts</samp> section of
+your <samp data-coord="prj5.umt:196:74">package.json</samp> file:
+</p><pre data-coord="prj5.umt:200:0">    "start": "parcel sensors-setup.html  --port 2347"
+</pre></li><li data-coord="prj5.umt:203:0"><p data-coord="prj5.umt:203:4">You should be able to start the parcel development server:
+</p><pre data-coord="prj5.umt:206:0">      $ npm start
+</pre><p data-coord="prj5.umt:209:4">If you get errors like
+</p><pre data-coord="prj5.umt:212:0">      cannot read property 'type' of undefined
+</pre><p data-coord="prj5.umt:215:4">and the server hangs, <samp data-coord="prj5.umt:215:26">^C</samp> out of it and start the server once
+more; that should work.
+</p></li><li data-coord="prj5.umt:218:0"><p data-coord="prj5.umt:218:4">Point your browser to port 2347 on your host.  You should
+see the sensors app load with four empty tabs.
+</p></li><li data-coord="prj5.umt:221:0"><p data-coord="prj5.umt:221:4">Add components for the four tabs to meet all project requirements.
+</p></li></ol><p data-coord="prj5.umt:224:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When it is complete
+please follow the procedure given in the
+<em data-coord="prj5.umt:224:214"><a href="../../misc/github-setup/github-setup.html" data-coord="prj5.umt:224:214">github setup directions</a></em>
+to submit your project using the <samp data-coord="prj5.umt:224:273">submit</samp> directory.
+</p></section></section>
+    </div> <!-- #content -->
+  </body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 444/544: Project 4</title>
+    <link href="prj4/hl-fine_blue.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../.." class="material-icons">house</a></li>
+	<li><a href="../../docs">Docs</a></li>
+	<li><a href="../../exams-quizzes">Exams &amp; Quizzes</a></li>
+	<li><a href="../../exercises">Exercises</a></li>
+	<li><a href="../../hws">Homeworks</a></li>
+	<li><a href="../../misc">Misc</a></li>
+	<li><a href="../../projects">Projects</a></li>
+	<li><a href="../../slides">Slides</a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj4.umt:1:0"><h1 data-coord="prj4.umt:1:0">Project 4</h1><p data-coord="prj4.umt:3:0"><strong data-coord="prj4.umt:3:0">Due</strong>: Nov 20 by 11:59p
+</p><p data-coord="prj4.umt:5:0"><strong data-coord="prj4.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj4.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj4.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p><p data-coord="prj4.umt:9:0">This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  This is followed by a log
+which should help you understand the requirements.  Finally, it
+provides some hints as to how those requirements can be met.
+</p><section data-coord="prj4.umt:14:0"><h2 data-coord="prj4.umt:14:0">Aims</h2><p data-coord="prj4.umt:17:0">The aims of this project are as follows:
+</p><ul data-coord="prj4.umt:19:0"><li data-coord="prj4.umt:19:0"><p data-coord="prj4.umt:19:4">To introduce you to using web services.
+</p></li><li data-coord="prj4.umt:21:0"><p data-coord="prj4.umt:21:4">To expose you to a templating system like mustache.
+</p></li><li data-coord="prj4.umt:23:0"><p data-coord="prj4.umt:23:4">To give you further experience with using the express.js web framework.
+</p></li></ul></section><section data-coord="prj4.umt:26:0"><h2 data-coord="prj4.umt:26:0">Requirements</h2><p data-coord="prj4.umt:29:0">You must push a <samp data-coord="prj4.umt:29:16">submit/prj4-sol</samp> directory to your github
+repository such that typing <samp data-coord="prj4.umt:29:87">npm ci</samp> within that directory is
+sufficient to run the project using <samp data-coord="prj4.umt:29:157">./index.js</samp>.  
+</p><p data-coord="prj4.umt:33:0">You are being provided with an <samp data-coord="prj4.umt:33:31">index.js</samp> which provides the required
+command-line behavior to start the program:
+</p><pre data-coord="prj4.umt:37:0">./index.js PORT SENSORS_WS_BASE_URL
+</pre><p data-coord="prj4.umt:40:0">where the arguments are:
+</p><dl data-coord="prj4.umt:42:0"><dt data-coord="prj4.umt:42:2"> <samp data-coord="prj4.umt:42:1">PORT</samp> </dt><dd data-coord="prj4.umt:43:0"><p data-coord="prj4.umt:43:4">This required argument is the port at which the program listens
+for web requests.
+</p></dd><dt data-coord="prj4.umt:46:2"> <samp data-coord="prj4.umt:46:1">SENSORS_WS_BASE_URL</samp> </dt><dd data-coord="prj4.umt:47:0"><p data-coord="prj4.umt:47:4">This required argument is the url specifying web URL at which
+an instance of the sensors web service from <em data-coord="prj4.umt:47:139"><a href="../prj3/prj3.html" data-coord="prj4.umt:47:139">Project 3</a></em> should be running.
+</p></dd></dl><p data-coord="prj4.umt:51:0">[In order to facilitate automated testing, all UI controls and result
+values are required to be labelled by HTML class names starting with
+the prefix <samp data-coord="prj4.umt:51:150">tst-</samp>.  In the requirements which follow, a mention of a
+name starting with <samp data-coord="prj4.umt:51:227">tst-</samp> means that the relevant control or value
+must be labelled by that <samp data-coord="prj4.umt:51:300">class</samp>.]
+</p><p data-coord="prj4.umt:57:0">What you specifically need to do is add code to the provided
+<a href="./prj4-sol/sensors.js?colorize=true" data-coord="prj4.umt:57:100">sensors.js</a> such that your
+server displays the following pages:
+</p><dl data-coord="prj4.umt:62:0"><dt data-coord="prj4.umt:62:2"> Home Page at URL <samp data-coord="prj4.umt:62:18">/</samp></dt><dd data-coord="prj4.umt:63:0"><p data-coord="prj4.umt:63:4">This page should display links to the following pages:
+</p><ul data-coord="prj4.umt:65:0"><li data-coord="prj4.umt:65:0"><p data-coord="prj4.umt:65:7"><strong data-coord="prj4.umt:65:7">Sensor Types Search Page</strong> <samp data-coord="prj4.umt:65:34">tst-sensor-types-search</samp>.
+</p></li><li data-coord="prj4.umt:67:0"><p data-coord="prj4.umt:67:7"><strong data-coord="prj4.umt:67:7">Sensor Type Add Page</strong> <samp data-coord="prj4.umt:67:30">tst-sensor-types-add</samp>.
+</p></li><li data-coord="prj4.umt:69:0"><p data-coord="prj4.umt:69:7"><strong data-coord="prj4.umt:69:7">Sensors Search Page</strong> <samp data-coord="prj4.umt:69:29">tst-sensors-search</samp>.
+</p></li><li data-coord="prj4.umt:71:0"><p data-coord="prj4.umt:71:7"><strong data-coord="prj4.umt:71:7">Sensors Add Page</strong> <samp data-coord="prj4.umt:71:26">tst-sensors-add</samp>.
+</p></li></ul></dd><dt data-coord="prj4.umt:73:2"> <strong data-coord="prj4.umt:73:1">Sensor Types Search Page</strong> </dt><dd data-coord="prj4.umt:74:0"><p data-coord="prj4.umt:74:5">This page must be identified by having any element with class
+<samp data-coord="prj4.umt:74:72">tst-sensor-types-search-page</samp>.  It should have two sections:
+</p><ul data-coord="prj4.umt:77:0"><li data-coord="prj4.umt:77:0"><p data-coord="prj4.umt:77:7">A search form for sensor types allowing searching by all sensor
+type fields excepts the limits fields. (see below).
+</p></li><li data-coord="prj4.umt:80:0"><p data-coord="prj4.umt:80:7">A results section showing the results delivered by the
+underlying web service from the last search.  Initially, the
+page should show the results of doing a sensor types search
+with all fields empty.
+</p></li></ul></dd><dt data-coord="prj4.umt:86:2"> <strong data-coord="prj4.umt:86:1">Sensor Types Add Page</strong> </dt><dd data-coord="prj4.umt:87:0"><p data-coord="prj4.umt:87:5">This page must be identified by having any element with class
+<samp data-coord="prj4.umt:87:72">tst-sensor-types-add-page</samp>.  It should contain a form allowing
+the user to specify values for all sensor type fields (see
+below).  Successful submission of this form should create or
+update a sensor type using the underlying web service and
+transfer control to the sensor types search page set up
+to show the results for the sensor type just created or
+updated.
+</p></dd><dt data-coord="prj4.umt:96:2"> <strong data-coord="prj4.umt:96:1">Sensors Search Page</strong> </dt><dd data-coord="prj4.umt:97:0"><p data-coord="prj4.umt:97:5">This page must be identified by having any element with class
+<samp data-coord="prj4.umt:97:72">tst-sensors-search-page</samp>.  It should have two sections:
+</p><ul data-coord="prj4.umt:100:0"><li data-coord="prj4.umt:100:0"><p data-coord="prj4.umt:100:7">A search form for sensor types allowing searching by all sensor
+type fields excepts the expected fields. (see below).
+</p></li><li data-coord="prj4.umt:103:0"><p data-coord="prj4.umt:103:7">A results section showing the results delivered by the
+underlying web service from the last search.  Initially, the
+page should show the results of doing a sensors search
+with all fields empty.
+</p></li></ul></dd><dt data-coord="prj4.umt:109:2"> <strong data-coord="prj4.umt:109:1">Sensors Add Page</strong> </dt><dd data-coord="prj4.umt:110:0"><p data-coord="prj4.umt:110:5">This page must be identified by having any element with class
+<samp data-coord="prj4.umt:110:72">tst-sensors-add-page</samp>.  It should contain a form allowing the
+user to specify values for all sensor fields (see below).
+Successful submission of this form should create or update a
+sensor using the underlying web service and transfer control to
+the sensor search page set up to show the results for the sensor
+just created or updated.
+</p></dd></dl><p data-coord="prj4.umt:118:0">The results section shown for the above search pages should contain a
+maximum of 5 sets of results.  Additionally, each set of results
+should show links for the next (<samp data-coord="prj4.umt:118:171">tst-next</samp>) or previous (<samp data-coord="prj4.umt:118:200">tst-prev</samp>) set of results, if applicable.
+</p><p data-coord="prj4.umt:123:0">All of the above pages except the home page must contain a footer
+having links to the above pages with classes <samp data-coord="prj4.umt:123:111">tst-home</samp>,
+<samp data-coord="prj4.umt:123:123">tst-sensor-types-search</samp>, <samp data-coord="prj4.umt:123:150">tst-sensor-types-add</samp>,
+<samp data-coord="prj4.umt:123:174">tst-sensors-search</samp> and <samp data-coord="prj4.umt:123:199">tst-sensors-add</samp> respectively.
+</p><section data-coord="prj4.umt:129:0"><h3 data-coord="prj4.umt:129:0">Sensor Type Fields</h3><p data-coord="prj4.umt:132:0">Sensor types have the following fields:
+</p><dl data-coord="prj4.umt:134:0"><dt data-coord="prj4.umt:134:2"> <strong data-coord="prj4.umt:134:1">Sensor Type ID</strong> <samp data-coord="prj4.umt:134:18">tst-sensor-type-id</samp> </dt><dd data-coord="prj4.umt:135:0"><p data-coord="prj4.umt:135:4">Uniquely identifying a sensor type.  Can only contain
+alphanumerics, <samp data-coord="prj4.umt:135:77">-</samp> or <samp data-coord="prj4.umt:135:84">_</samp> characters.
+</p></dd><dt data-coord="prj4.umt:138:2"> <strong data-coord="prj4.umt:138:1">Manufacturer</strong> <samp data-coord="prj4.umt:138:16">tst-manufacturer</samp> </dt><dd data-coord="prj4.umt:139:0"><p data-coord="prj4.umt:139:4">Can contain only <samp data-coord="prj4.umt:139:21">-</samp>, <samp data-coord="prj4.umt:139:26">'</samp>, space or alphabetic characters.
+</p></dd><dt data-coord="prj4.umt:141:2"> <strong data-coord="prj4.umt:141:1">Model Number</strong> <samp data-coord="prj4.umt:141:16">tst-model-number</samp> </dt><dd data-coord="prj4.umt:142:0"><p data-coord="prj4.umt:142:4">Can contain only <samp data-coord="prj4.umt:142:21">-</samp>, <samp data-coord="prj4.umt:142:26">'</samp>, space or alphanumeric characters.
+</p></dd><dt data-coord="prj4.umt:144:2"> <strong data-coord="prj4.umt:144:1">Quantity</strong> <samp data-coord="prj4.umt:144:12">tst-quantity</samp> </dt><dd data-coord="prj4.umt:145:0"><p data-coord="prj4.umt:145:4">Can only have internal values <samp data-coord="prj4.umt:145:34">temperature</samp>, <samp data-coord="prj4.umt:145:49">pressure</samp>,
+<samp data-coord="prj4.umt:145:65">flow</samp> or <samp data-coord="prj4.umt:145:75">humidity</samp>.
+</p></dd><dt data-coord="prj4.umt:148:2"> <strong data-coord="prj4.umt:148:1">Minimum Limit</strong> <samp data-coord="prj4.umt:148:17">tst-limits-min</samp></dt><dd data-coord="prj4.umt:149:0"><p data-coord="prj4.umt:149:4">A number.
+</p></dd><dt data-coord="prj4.umt:151:2"> <strong data-coord="prj4.umt:151:1">Maximum Limit</strong> <samp data-coord="prj4.umt:151:17">tst-limits-max</samp></dt><dd data-coord="prj4.umt:152:0"><p data-coord="prj4.umt:152:4">A number.
+</p></dd></dl><p data-coord="prj4.umt:154:0">Note that there is no field specifying the units for the limits.  Instead,
+the application should ensure that an appropriate unit is sent to the
+web service based on the specified quantity: <samp data-coord="prj4.umt:154:190">gpm</samp> for <samp data-coord="prj4.umt:154:200">flow</samp>, <samp data-coord="prj4.umt:154:208">%</samp> for
+<samp data-coord="prj4.umt:154:216">humidity</samp>, <samp data-coord="prj4.umt:154:228">PSI</samp> for <samp data-coord="prj4.umt:154:238">pressure</samp> and <samp data-coord="prj4.umt:154:253">C</samp> for <samp data-coord="prj4.umt:154:261">temperature</samp>.
+</p></section><section data-coord="prj4.umt:160:0"><h3 data-coord="prj4.umt:160:0">Sensor Fields</h3><p data-coord="prj4.umt:163:0">Sensors have the following fields:
+</p><dl data-coord="prj4.umt:165:0"><dt data-coord="prj4.umt:165:2"> <strong data-coord="prj4.umt:165:1">Sensor ID</strong> <samp data-coord="prj4.umt:165:13">tst-sensor-id</samp> </dt><dd data-coord="prj4.umt:166:0"><p data-coord="prj4.umt:166:4">Uniquely identifying a sensor.  Can only contain
+alphanumerics, <samp data-coord="prj4.umt:166:72">-</samp> or <samp data-coord="prj4.umt:166:79">_</samp> characters.
+</p></dd><dt data-coord="prj4.umt:169:2"> <strong data-coord="prj4.umt:169:1">Model</strong> <samp data-coord="prj4.umt:169:9">tst-model</samp> </dt><dd data-coord="prj4.umt:170:0"><p data-coord="prj4.umt:170:4">Can contain only alphanumerics, <samp data-coord="prj4.umt:170:36">-</samp> or <samp data-coord="prj4.umt:170:43">_</samp> characters.
+</p></dd><dt data-coord="prj4.umt:172:2"> <strong data-coord="prj4.umt:172:1">Period</strong> <samp data-coord="prj4.umt:172:10">tst-period</samp> </dt><dd data-coord="prj4.umt:173:0"><p data-coord="prj4.umt:173:4">Must be an integer.
+</p></dd><dt data-coord="prj4.umt:175:2"> <strong data-coord="prj4.umt:175:1">Expected Minimum</strong> <samp data-coord="prj4.umt:175:20">tst-expected-min</samp></dt><dd data-coord="prj4.umt:176:0"><p data-coord="prj4.umt:176:4">A number.
+</p></dd><dt data-coord="prj4.umt:178:2"> <strong data-coord="prj4.umt:178:1">Expected Maximum</strong> <samp data-coord="prj4.umt:178:20">tst-expected-max</samp></dt><dd data-coord="prj4.umt:179:0"><p data-coord="prj4.umt:179:4">A number.
+</p></dd></dl></section><section data-coord="prj4.umt:181:0"><h3 data-coord="prj4.umt:181:0">Error Handling</h3><p data-coord="prj4.umt:184:0">Invalid form input should result in the program re-displaying the form
+with suitable error messages. The redisplayed form input should retain
+its previous contents.  It should also display any errors resulting
+from the underlying web services. Each error message must have HTML
+class <samp data-coord="prj4.umt:184:284">error</samp>.
+</p></section><section data-coord="prj4.umt:190:0"><h3 data-coord="prj4.umt:190:0">Implementation Restrictions</h3><p data-coord="prj4.umt:193:0">You must use mustache for rendering all templates.  However, you may
+use any npm modules you find useful; in that case, your submission
+must be set up so that <samp data-coord="prj4.umt:193:159">npm ci</samp> downloads all the necessary modules.
+</p><p data-coord="prj4.umt:197:0">In this project, all your code must run only on the server; you cannot
+run any code within the browser.
+</p></section><section data-coord="prj4.umt:200:0"><h3 data-coord="prj4.umt:200:0">Look-and-Feel</h3><p data-coord="prj4.umt:203:0">There are no restrictions on the look-and-feel of the pages.
+</p></section></section><section data-coord="prj4.umt:205:0"><h2 data-coord="prj4.umt:205:0">Working Project</h2><p data-coord="prj4.umt:208:0">A working version of the project is available at
+<em data-coord="prj4.umt:208:83"><a href="http://zdu.binghamton.edu:2346" data-coord="prj4.umt:208:83">&lt;http://zdu.binghamton.edu:2346&gt;</a></em> (note that this URL will work
+only from within the CS network).
+</p><p data-coord="prj4.umt:212:0">[It does have a few rough edges which may be fixed (for example,
+handling of empty results is not always intuitive for the end user).
+Please report any problems which seem serious].
+</p></section><section data-coord="prj4.umt:218:0"><h2 data-coord="prj4.umt:218:0">Provided Files</h2><p data-coord="prj4.umt:221:0">The <a href="./prj4-sol" data-coord="prj4.umt:221:18">prj4-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj4.umt:224:0"><dt data-coord="prj4.umt:224:4"> <a href="./prj4-sol/sensors.js?colorize=true" data-coord="prj4.umt:224:40">sensors.js</a></dt><dd data-coord="prj4.umt:225:0"><p data-coord="prj4.umt:225:6">This file will constitute the guts of your project.  It
+should export a function which starts a web server
+on the port specified by its first argument and use
+the web services wrapped by the wrapper object specified
+by its second argument.
+</p></dd><dt data-coord="prj4.umt:231:4"> <a href="./prj4-sol/sensors-ws.js?colorize=true" data-coord="prj4.umt:231:43">sensors-ws.js</a></dt><dd data-coord="prj4.umt:232:0"><p data-coord="prj4.umt:232:6">This provides a wrapper object which wraps the
+<em data-coord="prj4.umt:232:80"><a href="../prj3/prj3.html" data-coord="prj4.umt:232:80">Project 3</a></em> web services.  The provided
+<a href="./prj4-sol/index.js?colorize=true" data-coord="prj4.umt:232:163">index.js</a> creates an
+instance of this wrapper object and injects it into your sensors
+server.  You should not need to change this file.
+</p></dd><dt data-coord="prj4.umt:238:4"> <a href="./prj4-sol/index.js?colorize=true" data-coord="prj4.umt:238:38">index.js</a></dt><dd data-coord="prj4.umt:239:0"><p data-coord="prj4.umt:239:6">This file provides the complete command-line behavior which is
+required by your program.  It requires
+<a href="./prj4-sol/sensors.js?colorize=true" data-coord="prj4.umt:239:159">sensors.js</a> and
+<a href="./prj4-sol/sensors-ws.js?colorize=true" data-coord="prj4.umt:239:222">sensors-ws.js.</a>  You
+<strong data-coord="prj4.umt:239:248">must not</strong> modify this file.
+</p><p data-coord="prj4.umt:245:6">After validating the command line arguments, it instantiates an
+instance of the web service wrapper using the web service URL
+provided on the command line.  It then calls the function
+exported by <a href="./prj4-sol/sensors.js?colorize=true" data-coord="prj4.umt:245:259">sensors.js</a>
+passing it the port specified on the command-line and the
+instance of the web service wrapper.
+</p></dd><dt data-coord="prj4.umt:252:4"> <a href="./prj4-sol/widget-view.js" data-coord="prj4.umt:252:30">widget-view.js</a> </dt><dd data-coord="prj4.umt:253:0"><p data-coord="prj4.umt:253:6">This file provides a function which takes a JavaScript object
+and translates it into a view object which can then be
+rendered using the <a href="./prj4-sol/templates/widget.ms" data-coord="prj4.umt:253:188">widget.ms</a>
+mustance template.  Its usage is described by comments within
+the file and built-in tests.
+</p></dd><dt data-coord="prj4.umt:259:4"> <a href="./prj4-sol/templates/widget.ms" data-coord="prj4.umt:259:35">widget.ms</a> </dt><dd data-coord="prj4.umt:260:0"><p data-coord="prj4.umt:260:6">A mustache template to render a view object created by
+<a href="./prj4-sol/widget-view.js" data-coord="prj4.umt:260:96">widget-view.js.</a>
+</p></dd><dt data-coord="prj4.umt:263:4"> <a href="./prj4-sol/mustache.js" data-coord="prj4.umt:263:27">mustache.js</a> </dt><dd data-coord="prj4.umt:264:0"><p data-coord="prj4.umt:264:6">Provides a wrapper object which renders a view using
+a mustache template.  Usage is documented in the file.
+</p></dd><dt data-coord="prj4.umt:267:4"> <a href="./prj4-sol/statics/css/style.css" data-coord="prj4.umt:267:37">style.css</a> </dt><dd data-coord="prj4.umt:268:0"><p data-coord="prj4.umt:268:6">A CSS stylesheet to provide styling to the project pages.  Most
+of the style rules use only HTML element selectors but a few of
+them use classes.  The use of these classes should be clear by
+examining the source of the pages rendered by the
+<em data-coord="prj4.umt:268:305"><a href="http://zdu.binghamton.edu:2346" data-coord="prj4.umt:268:305">sample solution</a></em> (CS-network
+only).
+</p></dd><dt data-coord="prj4.umt:275:4"> <a href="./prj4-sol/README" data-coord="prj4.umt:275:22">README</a></dt><dd data-coord="prj4.umt:276:0"><p data-coord="prj4.umt:276:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl><p data-coord="prj4.umt:283:0">Additionally, the <em data-coord="prj4.umt:283:41"><a href="../../data/sensors/" data-coord="prj4.umt:283:41">course data directory</a></em>
+contains sensor data files.  It's content is identical to the previous
+project.
+</p></section><section data-coord="prj4.umt:287:0"><h2 data-coord="prj4.umt:287:0">Hints</h2><p data-coord="prj4.umt:290:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj4.umt:293:0"><li data-coord="prj4.umt:293:0"><p data-coord="prj4.umt:293:4">You will need a solution to <em data-coord="prj4.umt:293:53"><a href="../prj3/prj3.html" data-coord="prj4.umt:293:53">Project 3</a></em> to
+provide the underlying web services.  You may choose to use your
+own solution or the provided <a href="../prj3-sol/" data-coord="prj4.umt:293:190">solution.</a> Note that the latter has some enhancements documented in
+its <a href="../prj3-sol/README" data-coord="prj4.umt:293:287">README</a> to facilitate this
+project.
+</p></li><li data-coord="prj4.umt:300:0"><p data-coord="prj4.umt:300:4">Once you have decided which solution to use, you will need to
+decide on the server on which you want to run the web services.
+If using the provided <a href="../prj3-sol/prj3-sol/" data-coord="prj4.umt:300:185">solution,</a> you may
+instead choose to use an already running instance at
+<em data-coord="prj4.umt:300:298"><a href="http://zdu.binghamton.edu:2345" data-coord="prj4.umt:300:298">&lt;http://zdu.binghamton.edu:2345&gt;</a></em>, Note that this can only be
+accessed from within the CS network and will be set up to purge
+all added data every hour on the hour.
+</p><p data-coord="prj4.umt:308:4">Once you have decided where you are running the web services,
+you will need to provide the URL for those web services
+when starting your program.  For example, if running your
+program on port 2346 and using the provided web services instance,
+you would start your program using:
+</p><pre data-coord="prj4.umt:315:0">    $ ./index.js 2346 http://zdu.binghamton.edu:2345
+</pre></li><li data-coord="prj4.umt:318:0"><p data-coord="prj4.umt:318:4">Read the project requirements thoroughly.  Look at the
+<em data-coord="prj4.umt:318:97"><a href="http://zdu.binghamton.edu:2346" data-coord="prj4.umt:318:97">sample web site</a></em> (CS network
+only).  Use the <em data-coord="prj4.umt:318:147">view source</em> control on your browser to reverse
+engineer the sample web site and understand how the requirements
+were implemented.
+</p></li><li data-coord="prj4.umt:326:0"><p data-coord="prj4.umt:326:4">The only URL specified for your project is <samp data-coord="prj4.umt:326:47">/</samp> for the home page.
+You should come up with suitable URLs for the other pages, or you
+can simply use the URLs from the sample solution.  Think about
+the URLs and methods used for form submission and how both
+successful and erroneous form submissions will be handled.
+</p></li><li data-coord="prj4.umt:332:0"><p data-coord="prj4.umt:332:4">Understand how the <a href="../../slides/users-ss/code/users" data-coord="prj4.umt:332:59">users-ss</a>
+application described in class used data to drive the code.
+Consider a similar approach for this project.  In particular,
+think about suitable data for both sensor-types and sensors which
+are easy to map into the requirements for
+<a href="./prj4-sol/widget-view.js" data-coord="prj4.umt:332:347">widget-view.js</a> while also providing
+sufficient information for validation.
+</p></li><li data-coord="prj4.umt:341:0"><p data-coord="prj4.umt:341:4">Start your project by copying in the provided files into your
+<samp data-coord="prj4.umt:341:70">work</samp> directory:
+</p><pre data-coord="prj4.umt:345:0">    $ cd ~/i?44/work  #change into your work directory
+    $ cp -pr $HOME/cs544/projects/prj4/prj4-sol .
+</pre></li><li data-coord="prj4.umt:350:0"><p data-coord="prj4.umt:350:4">Change into the newly created <samp data-coord="prj4.umt:350:34">prj4-sol</samp> directory and initialize
+your project by running <samp data-coord="prj4.umt:350:98">npm init</samp>.  Specifically:
+</p><pre data-coord="prj4.umt:354:0">    $ cd prj4-sol
+    $ npm init -y
+</pre><p data-coord="prj4.umt:358:4">This will create a <samp data-coord="prj4.umt:358:23">package.json</samp> file; this file should be
+committed to your repository.
+</p></li><li data-coord="prj4.umt:361:0"><p data-coord="prj4.umt:361:4">Install necessary external packages <samp data-coord="prj4.umt:361:40">cors</samp>,  <samp data-coord="prj4.umt:361:49">express</samp>
+<samp data-coord="prj4.umt:361:63">body-parser</samp>, <samp data-coord="prj4.umt:361:78">mustache</samp> and <samp data-coord="prj4.umt:361:93">axios</samp>:
+</p><pre data-coord="prj4.umt:365:0">    $ npm install cors express body-parser mustache axios
+</pre><p data-coord="prj4.umt:368:4">The libraries and dependencies will be installed into a
+<samp data-coord="prj4.umt:368:64">node_modules</samp> directory created within your current directory.
+It will also create a <samp data-coord="prj4.umt:368:154">package-lock.json</samp> which must be committed
+into your git repository.  The <samp data-coord="prj4.umt:368:233">node_modules</samp> directory should
+<strong data-coord="prj4.umt:368:269">not</strong> be committed to git.
+</p></li><li data-coord="prj4.umt:374:0"><p data-coord="prj4.umt:374:4">You should be able to run the project enough to get a usage
+message:
+</p><pre data-coord="prj4.umt:379:0">    ./index.js 
+    usage: index.js PORT SENSORS_WS_BASE_URL
+</pre></li><li data-coord="prj4.umt:383:0"><p data-coord="prj4.umt:383:4">Replace the <samp data-coord="prj4.umt:383:16">XXX</samp> entries in the <samp data-coord="prj4.umt:383:37">README</samp> template.
+</p></li><li data-coord="prj4.umt:386:0"><p data-coord="prj4.umt:386:4">Commit your project to github:
+</p><pre data-coord="prj4.umt:389:0">    $ git add .
+    $ git commit -a -m 'started prj4'
+</pre></li><li data-coord="prj4.umt:393:0"><p data-coord="prj4.umt:393:4">Work off the <a href="../../slides/users-ss/code/users" data-coord="prj4.umt:393:53">users-ss</a>
+example covered in class to create an <samp data-coord="prj4.umt:393:104">express app</samp>.  The app
+should squirrel away its initial arguments, as well as an instance
+of the mustache wrapper provided by <a href="prj4-sol/mustache.js" data-coord="prj4.umt:393:267">mustache.js</a> in <samp data-coord="prj4.umt:393:282">app</samp> storage.  It should listen on the specified
+<samp data-coord="prj4.umt:393:336">port</samp> and print out a message with the <samp data-coord="prj4.umt:393:376">listen</samp> handler.
+</p></li><li data-coord="prj4.umt:400:0"><p data-coord="prj4.umt:400:4">Start adding routing to your express <samp data-coord="prj4.umt:400:41">app</samp>.  Again, using the
+<a href="../../slides/users-ss/code/users" data-coord="prj4.umt:400:106">users-ss</a> application
+as an example, set up a directory from where express can
+serve static files.  Create an index.html page in that directory
+for the home page.  Use a browser to verify that you can display
+the home page at <samp data-coord="prj4.umt:400:347">/</samp>.
+</p><p data-coord="prj4.umt:407:4">The next few steps describe handling for sensor types.  While
+working on this, keep in mind that the handling for sensors is
+very similar and look for opportunities to parameterize your work
+so that it can also be used for handling sensors.
+</p></li><li data-coord="prj4.umt:412:0"><p data-coord="prj4.umt:412:4">Start a handler for the sensor types search page and set up a
+suitable route.  Create a suitable mustache template simply
+containing something like a title.  Have the handler render
+the template.  Verify that you can navigate to this page
+from your home page.
+</p></li><li data-coord="prj4.umt:418:0"><p data-coord="prj4.umt:418:4">Create a suitable footer template and include it into your page
+template as a mustache partial.  Note that the provided stylesheet
+assumes that the footer links are set up as a HTML list within a
+<samp data-coord="prj4.umt:418:212">footer</samp> section.
+</p></li><li data-coord="prj4.umt:423:0"><p data-coord="prj4.umt:423:4">Create a <samp data-coord="prj4.umt:423:13">form</samp> container within your template.
+</p></li><li data-coord="prj4.umt:425:0"><p data-coord="prj4.umt:425:4">Come up with static data which describes the sensor type fields.
+This data should be suitable for <a href="./prj4-sol/widget-view.js" data-coord="prj4.umt:425:139">widget-view.js</a> or should be easily transformed to be suitable.
+</p><p data-coord="prj4.umt:429:4">Start adding the sensor type form widgets to your <samp data-coord="prj4.umt:429:54">form</samp>
+container.  The template should merely iterate over widgets it
+receives in its view-model and defer the actual rendering of a
+widget to the <samp data-coord="prj4.umt:429:213">widget</samp> partial.
+</p><p data-coord="prj4.umt:434:4">Iterate this step until all fields are being rendered correctly.
+</p></li><li data-coord="prj4.umt:436:0"><p data-coord="prj4.umt:436:4">Set things up so that form submission redisplays the page with all
+form values retained.  This should happen pretty much automatically
+if you use the query parameters object to populate the form values.
+</p></li><li data-coord="prj4.umt:440:0"><p data-coord="prj4.umt:440:4">Add code to validate the values submitted by the form.  Set up the
+validation to be driven using the static data you set up for
+sensor types.  If an error message is related to a specific form
+widget, ensure that it is displayed next to that widget by adding
+it to the <samp data-coord="prj4.umt:440:289">opts</samp> options argument to <samp data-coord="prj4.umt:440:316">widgetView()</samp>.
+</p></li><li data-coord="prj4.umt:446:0"><p data-coord="prj4.umt:446:4">Each time the form is displayed, fire off a request to the
+corresponding web service.  Use any debugging technique
+to verify that the call is being made correctly.
+</p></li><li data-coord="prj4.umt:450:0"><p data-coord="prj4.umt:450:4">Add a section to your template to display the results returned by
+the web services.  Note that the provided stylesheet is set up to
+display these results in a table using selector <samp data-coord="prj4.umt:450:192">table.summary</samp>.
+</p></li><li data-coord="prj4.umt:454:0"><p data-coord="prj4.umt:454:4">Add scrolling capabilities for the previous and next set of
+results.  This is as simple as using relative links which contain
+only the query parameters of the links returned by the web services.
+Note that the provided stylesheet assumes that the scrolling controls
+have a <samp data-coord="prj4.umt:454:292">.scroll</samp> ancestor.
+</p><p data-coord="prj4.umt:460:4">Verify operation of the sensor type search functionality.
+</p></li><li data-coord="prj4.umt:462:0"><p data-coord="prj4.umt:462:4">Set up a page for the create / update functionality for sensor
+types.  Notice that the form is very similar to that
+for sensor types search.  Try to reuse the code and mustache
+template from the search.  
+</p></li><li data-coord="prj4.umt:467:0"><p data-coord="prj4.umt:467:4">Set up a handler for the create / update.  It is easiest
+to use the same handler for both displaying the form
+and submitting the form.
+</p><p data-coord="prj4.umt:471:4">To facilitate getting the value of the limits fields
+as an object, set up your bodyparser middleware appropriately:
+</p><pre>    bodyParser<span class="hl opt">.</span><span class="hl kwd">urlencoded</span><span class="hl opt">({</span>extended<span class="hl opt">:</span> <span class="hl kwa">true</span><span class="hl opt">})</span></pre><p data-coord="prj4.umt:478:4">By specifying <samp data-coord="prj4.umt:478:18">extended</samp> as <code><span class="hl kwa">true</span></code>, you ensure that
+the middleware will deliver the values of widgets with
+names like <samp data-coord="prj4.umt:478:131">limits[min]</samp> and <samp data-coord="prj4.umt:478:149">limits[max]</samp> in a widget
+named <samp data-coord="prj4.umt:478:185">limits</samp> with <samp data-coord="prj4.umt:478:199">min</samp> and <samp data-coord="prj4.umt:478:209">max</samp> properties.
+</p><p data-coord="prj4.umt:483:4">The handler should check (<samp data-coord="prj4.umt:483:34">req.method</samp>) whether the form is
+being submitted or merely displayed.  If the latter, it should
+simply render the view.  If the former, it should validate.  If
+the validation fails, it should redisplay with errors.  If the
+validation succeeds it should call the underlying web service and
+redirect to the search page so that the search displays data for
+the newly created or updated sensor type.  This is an application
+of the <a href="https://en.wikipedia.org/wiki/Post/Redirect/Get" data-coord="prj4.umt:483:545">Post/Redirect/Get</a> pattern.
+</p></li><li data-coord="prj4.umt:493:0"><p data-coord="prj4.umt:493:4">Repeat the above for sensor information.  Note that
+you should be able to reuse much of your code for
+sensor types.  Ideally, this reuse should be via
+parameterization and not cut-and-paste.
+</p></li><li data-coord="prj4.umt:498:0"><p data-coord="prj4.umt:498:4">Iterate until you meet all requirements.  
+</p></li></ol><p data-coord="prj4.umt:500:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When it is complete
+please follow the procedure given in the
+<em data-coord="prj4.umt:500:214"><a href="../../misc/github-setup/github-setup.html" data-coord="prj4.umt:500:214">github setup directions</a></em>
+to submit your project using the <samp data-coord="prj4.umt:500:273">submit</samp> directory.
+</p></section></section>
+    </div> <!-- #content -->
+  </body>
+</html>

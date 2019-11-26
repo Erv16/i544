@@ -1,0 +1,12 @@
+Changes wrt specs:
+
+  + Added name of offending widget to AppError.
+
+  + Added additional error checking to ensure that sensor's expected
+    range is within underlying sensor's limits.
+
+  + Ensure that empty filter search parameters are ignored.
+
+  + Ensure that filter parameter search parameters are used even when
+    there is an ID.
+

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 444/544: Project 2</title>
+    <link href="prj2/hl-fine_blue.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../.." class="material-icons">house</a></li>
+	<li><a href="../../docs">Docs</a></li>
+	<li><a href="../../exams-quizzes">Exams &amp; Quizzes</a></li>
+	<li><a href="../../exercises">Exercises</a></li>
+	<li><a href="../../hws">Homeworks</a></li>
+	<li><a href="../../misc">Misc</a></li>
+	<li><a href="../../projects">Projects</a></li>
+	<li><a href="../../slides">Slides</a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj2.umt:1:0"><h1 data-coord="prj2.umt:1:0">Project 2</h1><p data-coord="prj2.umt:3:0"><strong data-coord="prj2.umt:3:0">Due</strong>: Oct 11 by 11:59p
+</p><p data-coord="prj2.umt:5:0"><strong data-coord="prj2.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj2.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj2.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p><p data-coord="prj2.umt:9:0">This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  This is followed by a log
+which should help you understand the requirements.  Finally, it
+provides some hints as to how those requirements can be met.
+</p><section data-coord="prj2.umt:14:0"><h2 data-coord="prj2.umt:14:0">Aims</h2><p data-coord="prj2.umt:17:0">The aims of this project are as follows:
+</p><ul data-coord="prj2.umt:19:0"><li data-coord="prj2.umt:19:0"><p data-coord="prj2.umt:19:4">To give you more experience with JavaScript programming.
+</p></li><li data-coord="prj2.umt:21:0"><p data-coord="prj2.umt:21:4">To expose you to mongodb.
+</p></li><li data-coord="prj2.umt:23:0"><p data-coord="prj2.umt:23:4">To make you comfortable using nodejs packages and module system.
+</p></li></ul></section><section data-coord="prj2.umt:26:0"><h2 data-coord="prj2.umt:26:0">Requirements</h2><p data-coord="prj2.umt:30:0">You must push a <samp data-coord="prj2.umt:30:16">submit/prj2-sol</samp> directory to your github
+repository such that typing <samp data-coord="prj2.umt:30:87">npm ci</samp> within that directory is
+sufficient to run the project using <samp data-coord="prj2.umt:30:157">./index.js</samp>.  
+</p><p data-coord="prj2.umt:34:0">You are being provided with an <samp data-coord="prj2.umt:34:31">index.js</samp> which provides the required
+command-line behavior.  What you specifically need to do is add code
+to the provided <a href="./prj2-sol/sensors.js?colorize=true" data-coord="prj2.umt:34:194">sensors.js</a> source file as per the requirements in that file.
+</p><p data-coord="prj2.umt:39:0">The API is extremely similar to that for your previous project.  The
+differences include:
+</p><ul data-coord="prj2.umt:42:0"><li data-coord="prj2.umt:42:0"><p data-coord="prj2.umt:42:4">The <samp data-coord="prj2.umt:42:8">Sensors</samp> class must provide persistent storage by using
+a <a href="https://www.mongodb.com/" data-coord="prj2.umt:42:99">mongodb</a> database.
+</p></li><li data-coord="prj2.umt:45:0"><p data-coord="prj2.umt:45:4">An instance of the <samp data-coord="prj2.umt:45:23">Sensors</samp> class is created externally by calling
+an <code>async <span class="hl kwd">newSensors</span><span class="hl opt">()</span></code> factory method.  This is for reasons
+discussed in class.
+</p></li><li data-coord="prj2.umt:49:0"><p data-coord="prj2.umt:49:4">All application errors are reported using an array of <samp data-coord="prj2.umt:49:58">AppError</samp>
+objects.  The provided <samp data-coord="prj2.umt:49:96">AppError</samp> class simply wraps an error
+code and message; the code will make it easy to classify 
+errors in future projects.
+</p></li></ul><p data-coord="prj2.umt:54:0">The behavior of the program is illustrated in this
+<em data-coord="prj2.umt:54:76"><a href="aux-files/sensors.LOG" data-coord="prj2.umt:54:76">annotated log</a></em>.
+</p></section><section data-coord="prj2.umt:60:0"><h2 data-coord="prj2.umt:60:0">Provided Files</h2><p data-coord="prj2.umt:63:0">The <a href="./prj2-sol" data-coord="prj2.umt:63:18">prj2-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj2.umt:66:0"><dt data-coord="prj2.umt:66:4"> <a href="./prj2-sol/sensors.js?colorize=true" data-coord="prj2.umt:66:40">sensors.js</a></dt><dd data-coord="prj2.umt:67:0"><p data-coord="prj2.umt:67:6">This skeleton file constitutes the guts of your project.  You
+will need to flesh out the skeleton, adding code as per the
+documentation.  You should feel free to add any auxiliary
+function or method definitions as required.
+</p><p data-coord="prj2.umt:72:6">The provided code does most (<strong data-coord="prj2.umt:72:39">not all</strong>) the validations
+necessary for this project.
+</p></dd><dt data-coord="prj2.umt:75:4"> <a href="./prj2-sol/index.js?colorize=true" data-coord="prj2.umt:75:38">index.js</a></dt><dd data-coord="prj2.umt:76:0"><p data-coord="prj2.umt:76:6">This file provides the complete command-line behavior which is
+required by your program.  It requires
+<a href="./prj2-sol/sensors.js?colorize=true" data-coord="prj2.umt:76:159">sensors.js.</a>  You <strong data-coord="prj2.umt:76:176">must
+      not</strong> modify this file; this ensures that your <samp data-coord="prj2.umt:76:234">Sensors</samp> class
+meets its specifications and facilitates automated testing by
+testing only the <samp data-coord="prj2.umt:76:341">Sensors</samp> API.
+</p></dd><dt data-coord="prj2.umt:83:4"> <a href="./prj2-sol/app-error.js?colorize=true" data-coord="prj2.umt:83:42">app-error.js</a></dt><dd data-coord="prj2.umt:84:0"><p data-coord="prj2.umt:84:6">A trival class for application errors.
+</p></dd><dt data-coord="prj2.umt:86:4"> <a href="./prj2-sol/validate.js?colorize=true" data-coord="prj2.umt:86:41">validate.js</a></dt><dd data-coord="prj2.umt:87:0"><p data-coord="prj2.umt:87:6">Validation code from the previous project.  Note that
+it provides generic validation based on types for
+input parameters.  More validation will be necessary,
+especially for checking that a parameter specifies
+some other object via its id.
+</p></dd><dt data-coord="prj2.umt:93:4"> <a href="./prj2-sol/README" data-coord="prj2.umt:93:22">README</a></dt><dd data-coord="prj2.umt:94:0"><p data-coord="prj2.umt:94:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl><p data-coord="prj2.umt:101:0">Additionally, the <em data-coord="prj2.umt:101:41"><a href="../../data/sensors/" data-coord="prj2.umt:101:41">course data directory</a></em>
+contains sensor data files.  It's content is identical to the previous
+project except that the error data files have been enhanced with
+objects which shows the errors resulting from references to
+non-existing objects.
+</p></section><section data-coord="prj2.umt:107:0"><h2 data-coord="prj2.umt:107:0">MongoDB</h2><p data-coord="prj2.umt:110:0"><a href="https://docs.mongodb.com/manual/" data-coord="prj2.umt:110:36">MongoDB</a> is a popular nosql
+database.  It allows storage of <em data-coord="prj2.umt:110:95">collections</em> of <em data-coord="prj2.umt:110:112">documents</em> to be
+accessed by a primary key named <samp data-coord="prj2.umt:110:162">_id</samp>.  
+</p><p data-coord="prj2.umt:114:0">In terms of JavaScript, mongodb documents correspond to arbitrarily
+nested JavaScript <samp data-coord="prj2.umt:114:86">Object</samp>s having a top-level <samp data-coord="prj2.umt:114:115">_id</samp> property which is
+used as a primary key. If an object does not have an <samp data-coord="prj2.umt:114:192">_id</samp> property,
+then one will be created with a unique value assigned by mongodb.
+</p><ul data-coord="prj2.umt:119:0"><li data-coord="prj2.umt:119:0"><p data-coord="prj2.umt:119:4">MongoDB provides a basic repertoire of
+<em data-coord="prj2.umt:119:88"><a href="https://docs.mongodb.com/manual/crud/" data-coord="prj2.umt:119:88">CRUD Operations</a></em>.
+</p></li><li data-coord="prj2.umt:123:0"><p data-coord="prj2.umt:123:4">All asynchronous mongo library functions can be called directly using
+<samp data-coord="prj2.umt:123:78">await</samp>.
+</p></li><li data-coord="prj2.umt:126:0"><p data-coord="prj2.umt:126:4">It is important to ensure that all database connections are closed.
+Otherwise your program will not exit gracefully.
+</p></li></ul><p data-coord="prj2.umt:129:0">You can play with mongo by starting up a
+<em data-coord="prj2.umt:129:83"><a href="https://docs.mongodb.com/manual/mongo/" data-coord="prj2.umt:129:83">mongo shell</a></em>:
+</p><pre data-coord="prj2.umt:133:0">$ $ mongo
+MongoDB shell version v3.6.3
+connecting to: mongodb://127.0.0.1:27017
+MongoDB server version: 3.6.3
+Server has startup warnings: 
+...
+&gt; help
+	db.help()                    help on db methods
+	...
+	exit                         quit the mongo shell
+&gt; 
+</pre><p data-coord="prj2.umt:147:0">Since mongodb is available for different languages, make sure that you
+are looking at the
+<em data-coord="prj2.umt:147:167"><a href="http://mongodb.github.io/node-mongodb-native/3.3/quick-start/quick-start/" data-coord="prj2.umt:147:167">nodejs documentation</a></em>.
+</p><ul data-coord="prj2.umt:152:0"><li data-coord="prj2.umt:152:0"><p data-coord="prj2.umt:152:4">You can get a connection to a mongodb server using the mongo
+client's asynchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/MongoClient.html#.connect" data-coord="prj2.umt:152:181">connect()</a> method.
+</p></li><li data-coord="prj2.umt:157:0"><p data-coord="prj2.umt:157:4">Once you have a connection to a server, you can get to a specific
+database using the synchronous <a href="http://mongodb.github.io/node-mongodb-native/3.3/api/MongoClient.html#db" data-coord="prj2.umt:157:181">db()</a> method.
+</p></li><li data-coord="prj2.umt:160:0"><p data-coord="prj2.umt:160:4">From a database, you can get to a specific collection using the
+synchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Db.html#collection" data-coord="prj2.umt:160:167">collection()</a> method.
+</p></li><li data-coord="prj2.umt:165:0"><p data-coord="prj2.umt:165:4">Given a collection, you can asynchronously insert into it using
+the
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Collection.html#insertOne" data-coord="prj2.umt:165:166">insert*()</a> methods.  However, the code for using <samp data-coord="prj2.umt:165:214">insert*()</samp> to do
+replacements can get complicated.  An easier alternative may be to
+use the asynchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Collection.html#replaceOne" data-coord="prj2.umt:165:419">replaceOne()</a> method with the
+<a href="https://docs.mongodb.com/manual/reference/method/db.collection.replaceOne/" data-coord="prj2.umt:165:534">upsert</a> option.
+</p></li><li data-coord="prj2.umt:176:0"><p data-coord="prj2.umt:176:4">Given a collection, you can asynchronously
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Collection.html#find" data-coord="prj2.umt:176:132">find()</a> a cursor which meets the criteria specified by a query to
+<samp data-coord="prj2.umt:176:201">find()</samp>.  The query can be used to filter the collection;
+specifically, if the filter specifies an <samp data-coord="prj2.umt:176:305">_id</samp>, then the cursor
+returned by the <samp data-coord="prj2.umt:176:348">find()</samp> should contain at most one result.
+</p></li><li data-coord="prj2.umt:183:0"><p data-coord="prj2.umt:183:4">Given a cursor, you can modify it using the synchronous
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Cursor.html#sort" data-coord="prj2.umt:183:141">sort(),</a>
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Cursor.html#skip" data-coord="prj2.umt:183:230">skip()</a> and
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Cursor.html#limit" data-coord="prj2.umt:183:323">limit()</a> methods.
+</p></li><li data-coord="prj2.umt:191:0"><p data-coord="prj2.umt:191:4">Given a cursor, you can get all its results as an array using the
+asynchronous <a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Cursor.html#toArray" data-coord="prj2.umt:191:163">toArray()</a> method.
+</p></li></ul></section><section data-coord="prj2.umt:195:0"><h2 data-coord="prj2.umt:195:0">Hints</h2><p data-coord="prj2.umt:199:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj2.umt:202:0"><li data-coord="prj2.umt:202:0"><p data-coord="prj2.umt:202:4">Read the project requirements thoroughly.  Look at the
+sample log to make sure you understand the necessary behavior.
+Review the material covered in class including the
+<a href="../../slides/users-store/code/user-store" data-coord="prj2.umt:202:229">user-store</a>
+example.
+</p></li><li data-coord="prj2.umt:209:0"><p data-coord="prj2.umt:209:4">Look into debugging methods for your project.  Possibilities
+include:
+</p><ul data-coord="prj2.umt:212:0"><li data-coord="prj2.umt:212:0"><p data-coord="prj2.umt:212:8">Logging debugging information onto the terminal using
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/log" data-coord="prj2.umt:212:135">console.log()</a> or
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/error" data-coord="prj2.umt:212:220">console.error().</a>
+</p></li><li data-coord="prj2.umt:218:0"><p data-coord="prj2.umt:218:8">Use the chrome debugger as outlined in this
+<a href="https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27" data-coord="prj2.umt:218:164">article.</a>
+</p><p data-coord="prj2.umt:222:8">The couple of minutes spent looking at this link and setting up chrome
+as your debugger for this project will be more than repaid
+in the time saved adding and removing <samp data-coord="prj2.umt:222:178">console.log()</samp> statements
+to your code.
+</p></li></ul></li><li data-coord="prj2.umt:228:0"><p data-coord="prj2.umt:228:4">Consider how you can use mongo to implement this project.  to
+access its sensor type and readings easily.  Try to use mongo's
+facilities as much as possible; for example, instead of writing
+code for filtering, design your database objects such that you can
+use the filtering capabilities of mongo's
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Collection.html#find" data-coord="prj2.umt:228:404">find()</a> method; use the cursor modification methods like
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Cursor.html#skip" data-coord="prj2.umt:228:541">skip()</a> and
+<a href="http://mongodb.github.io/node-mongodb-native/3.3/api/Cursor.html#limit" data-coord="prj2.umt:228:634">limit()</a> to implement paging within results.
+</p><p data-coord="prj2.umt:242:4">Since opening a connection to a database is an expensive operation,
+it is common to open up a connection at the start of a program and
+hang on to that connection for the duration of the program.  It is
+also important to remember to close the connection before termination
+of the program.
+</p><p data-coord="prj2.umt:248:4">[Note that the command-line program for this project performs only
+a single command for each program run.  Nevertheless, the API
+provided for <samp data-coord="prj2.umt:248:154">Sensors</samp> allows for multiple operations for
+each instance; hence you should associate the database connection
+with the instance of <samp data-coord="prj2.umt:248:294">Sensors</samp>.]
+</p></li><li data-coord="prj2.umt:255:0"><p data-coord="prj2.umt:255:4">Start your project by creating a <samp data-coord="prj2.umt:255:37">work/prj2-sol</samp> directory in the
+<samp data-coord="prj2.umt:255:74">i444</samp> or <samp data-coord="prj2.umt:255:84">i544</samp> directory corresponding to your github
+repository.  Change into the newly created <samp data-coord="prj2.umt:255:177">prj2-sol</samp> directory
+and initialize your project by running <samp data-coord="prj2.umt:255:241">npm init -y</samp>.  This will
+create a <samp data-coord="prj2.umt:255:280">package.json</samp> file; this file should be committed to
+your repository.
+</p></li><li data-coord="prj2.umt:262:0"><p data-coord="prj2.umt:262:4">Install the mongodb client library using <samp data-coord="prj2.umt:262:45">npm install mongodb</samp>.
+It will install the library and its dependencies into a
+<samp data-coord="prj2.umt:262:132">node_modules</samp> directory created within your current directory.
+It will also create a <samp data-coord="prj2.umt:262:222">package-lock.json</samp> which must be committed
+into your git repository.
+</p><p data-coord="prj2.umt:268:4">The created <samp data-coord="prj2.umt:268:16">node_modules</samp> directory should <strong data-coord="prj2.umt:268:48">not</strong> be committed to
+git.  You can ensure that it will not be committed by simply
+mentioning it in a <samp data-coord="prj2.umt:268:158">.gitignore</samp> file.  You should have already
+taken care of this if you followed the
+<a href="../../misc/github-setup/github-setup.html" data-coord="prj2.umt:268:294">directions</a> provided
+when setting up github.  If you have not done so, please add a
+line containing simply <samp data-coord="prj2.umt:268:408">node_modules</samp> to a <samp data-coord="prj2.umt:268:428">.gitignore</samp> file at
+the top-level of your <samp data-coord="prj2.umt:268:475">i444</samp> or <samp data-coord="prj2.umt:268:485">i544</samp> github project.
+</p></li><li data-coord="prj2.umt:277:0"><p data-coord="prj2.umt:277:4">Copy the provided files into your project directory:
+</p><pre data-coord="prj2.umt:280:0">    $ cp -pr $HOME/cs544/projects/prj2/prj2-sol/* .
+</pre><p data-coord="prj2.umt:283:4">This should copy in the <samp data-coord="prj2.umt:283:28">README</samp> template, the <samp data-coord="prj2.umt:283:51">index.js</samp>, the
+<samp data-coord="prj2.umt:283:71">sensors.js</samp> skeleton file and the utility files <samp data-coord="prj2.umt:283:120">app-error.js</samp>
+and <samp data-coord="prj2.umt:283:143">validate.js</samp> into your project directory.
+</p></li><li data-coord="prj2.umt:287:0"><p data-coord="prj2.umt:287:4">You should be able to run the project but all commands will return
+without any results until you replace the @TODO sections with
+suitable code.
+</p><p data-coord="prj2.umt:291:4">The provided code does have sufficient functionality to get a
+usage message:
+</p><pre data-coord="prj2.umt:295:0">    $ ./index.js
+    usage: index.js MONGO_DB_URL CMD [ARGS...]
+    Command CMD can be
+    add   sensor-type|sensor|sensor-data NAME=VALUE...
+    clear clear all sensor data
+    find  sensor-type|sensor|sensor-data [NAME=VALUE...]
+    help  output this message
+    load  sensor-type|sensor|sensor-data JSON_FILE...
+</pre><p data-coord="prj2.umt:305:4">or do some simple validations:
+</p><pre data-coord="prj2.umt:308:0">    $ ./index.js GARBAGE_URL clear _id=1
+    sorry; clear does not accept any arguments
+    $ ./index.js GARBAGE_URL find sensor-type _id=1
+    RESERVED: the _id parameter is reserved for internal use only
+</pre></li><li data-coord="prj2.umt:316:0"><p data-coord="prj2.umt:316:4">Replace the <samp data-coord="prj2.umt:316:16">XXX</samp> entries in the <samp data-coord="prj2.umt:316:37">README</samp> template.
+</p></li><li data-coord="prj2.umt:319:0"><p data-coord="prj2.umt:319:4">Commit your project to github:
+</p><pre data-coord="prj2.umt:322:0">    $ git add .
+    $ git commit -a -m 'started prj2'
+</pre></li><li data-coord="prj2.umt:326:0"><p data-coord="prj2.umt:326:4">Open the copy of the <samp data-coord="prj2.umt:326:25">sensors.js</samp> file in your project directory.
+It contains
+</p><ol data-coord="prj2.umt:329:0"><li data-coord="prj2.umt:329:0"><p data-coord="prj2.umt:329:9">A <samp data-coord="prj2.umt:329:11">strict</samp> declaration followed by initial imports.  The
+local imports include the <samp data-coord="prj2.umt:329:101">AppError</samp> wrapper class as well
+as a <samp data-coord="prj2.umt:329:141">validate()</samp> module which contains the generic
+validation code from the previous project.
+</p></li><li data-coord="prj2.umt:334:0"><p data-coord="prj2.umt:334:8">A skeleton <samp data-coord="prj2.umt:334:19">Sensors</samp> <samp data-coord="prj2.umt:334:29">class</samp> definition with specification
+comments and <samp data-coord="prj2.umt:334:87">@TODO</samp> comments.  The specification comments
+specify the behavior of the methods you need to complete.
+</p></li><li data-coord="prj2.umt:338:0"><p data-coord="prj2.umt:338:8">An assignment of the <samp data-coord="prj2.umt:338:29">Sensors</samp> <samp data-coord="prj2.umt:338:39">class</samp> to <samp data-coord="prj2.umt:338:50">module.exports</samp>.
+This makes <samp data-coord="prj2.umt:338:87">Sensors</samp> the only declarations available outside
+the <samp data-coord="prj2.umt:338:149">sensors.js</samp> file; all other declarations are local to the
+file.
+</p></li><li data-coord="prj2.umt:343:0"><p data-coord="prj2.umt:343:8">Options that you should use when creating a connection to
+a mongo db.
+</p></li><li data-coord="prj2.umt:346:0"><p data-coord="prj2.umt:346:8">A trivial utility function.
+</p></li></ol><p data-coord="prj2.umt:348:4">Some points worth making about the provided code:
+</p><ul data-coord="prj2.umt:350:0"><li data-coord="prj2.umt:350:0"><p data-coord="prj2.umt:350:8">All the methods have been declared <samp data-coord="prj2.umt:350:43">async</samp>.  This allows you
+to <samp data-coord="prj2.umt:350:80">await</samp> asynchronous calls to mongo library functions.
+</p></li><li data-coord="prj2.umt:353:0"><p data-coord="prj2.umt:353:8">For error handling, the convention used is that all user
+errors should be thrown as lists of <samp data-coord="prj2.umt:353:109">AppError</samp> (for example,
+see the <samp data-coord="prj2.umt:353:150">throw</samp>'s within the
+<a href="prj2-sol/validate.js??colorize=true" data-coord="prj2.umt:353:218">validate</a> module).  If
+you need to <samp data-coord="prj2.umt:353:260">throw</samp> your own errors, be sure to wrap them into
+<samp data-coord="prj2.umt:353:319">AppError</samp> objects in a list.  Wrap in the list even for a
+single error:
+</p><pre>        <span class="hl kwa">if</span> <span class="hl opt">(</span><span class="hl com">/* no sensor-type for specified sensor model */</span><span class="hl opt">) {</span>
+          <span class="hl kwb">const</span> err <span class="hl opt">=</span> `no model $<span class="hl opt">{</span>model<span class="hl opt">}</span> sensor type`<span class="hl opt">;</span>
+          <span class="hl kwa">throw</span> <span class="hl opt">[</span> <span class="hl kwa">new</span> <span class="hl kwd">AppError</span><span class="hl opt">(</span><span class="hl str">&apos;X_ID&apos;</span><span class="hl opt">,</span> err<span class="hl opt">) ];</span>
+        <span class="hl opt">}</span></pre><p data-coord="prj2.umt:368:8">The two levels of wrapping achieves the following:
+</p><ul data-coord="prj2.umt:370:0"><li data-coord="prj2.umt:370:0"><p data-coord="prj2.umt:370:13">Wrapping in the <samp data-coord="prj2.umt:370:29">AppError</samp> allows an error object
+to contain a <samp data-coord="prj2.umt:370:82">code</samp> which can be used subsequently 
+to classify the error.
+</p></li><li data-coord="prj2.umt:374:0"><p data-coord="prj2.umt:374:13">Wrapping the errors into a list allows reporting multiple
+errors in a single API call.  It also allows the calling
+code to distinguish between exceptions caused by
+intentional error reporting and those caused
+inadvertently; the former can be reported as simple error
+messages whereas the latter will be reported using a full
+stack trace.  This makes it much easier to debug your
+code when you get unintentional exceptions.
+</p></li></ul></li></ul></li><li data-coord="prj2.umt:384:0"><p data-coord="prj2.umt:384:4">Start by implementing the factory method for <samp data-coord="prj2.umt:384:49">newSensors()</samp>.
+</p><ul data-coord="prj2.umt:387:0"><li data-coord="prj2.umt:387:0"><p data-coord="prj2.umt:387:10">Validate the parameters to the method.  The <samp data-coord="prj2.umt:387:54">mongoDbUrl</samp>
+must be a valid URL of the form <samp data-coord="prj2.umt:387:102">mongodb://HOST:PORT/DB</samp>.
+If invalid, return a suitable error.
+</p></li><li data-coord="prj2.umt:391:0"><p data-coord="prj2.umt:391:10">If the parameters are valid, connect to the database (note
+that you will need to split <samp data-coord="prj2.umt:391:100">mongoDbUrl</samp> into the base
+part and the database name).
+</p></li><li data-coord="prj2.umt:395:0"><p data-coord="prj2.umt:395:10">Finally, synchronously call the <samp data-coord="prj2.umt:395:42">constructor()</samp>.  The
+constructor should cache the database client connection in
+the instance and set up instance variables for the database
+collections you are using.
+</p></li></ul><p data-coord="prj2.umt:400:4">[An instance of a <samp data-coord="prj2.umt:400:22">Sensors</samp> should contain a database connection,
+ but obtaining a database connection is an asynchronous operation.
+ Since it is impossible to have an
+ <em data-coord="prj2.umt:400:268"><a href="https://stackoverflow.com/questions/43431550/async-await-class-constructor" data-coord="prj2.umt:400:268">asynchronous constructor</a></em>, an <samp data-coord="prj2.umt:400:299">async</samp> factory method provides a
+ workaround].
+</p></li><li data-coord="prj2.umt:407:0"><p data-coord="prj2.umt:407:4">Implement the <samp data-coord="prj2.umt:407:18">close()</samp> method for <samp data-coord="prj2.umt:407:39">Sensors</samp>.  You simply need
+to <samp data-coord="prj2.umt:407:74">await</samp> a <samp data-coord="prj2.umt:407:84">close()</samp> on your database <samp data-coord="prj2.umt:407:111">client</samp>.
+</p></li><li data-coord="prj2.umt:410:0"><p data-coord="prj2.umt:410:4">The code for adding a sensor-type, sensor or sensor-data is likely
+to be very similar.  Factor out this commonality into a "private"
+method (there are no "private" methods in JavaScript; a common
+convention is to indicate that a method is intended to be private
+by having its name start with a <samp data-coord="prj2.umt:410:316">_</samp>.).
+</p></li><li data-coord="prj2.umt:416:0"><p data-coord="prj2.umt:416:4">As for the <samp data-coord="prj2.umt:416:15">add*()</samp> methods, many of the <samp data-coord="prj2.umt:416:45">find*()</samp> methods will be
+very similar.  Once again, factor out this commonality into a
+"private" method.
+</p></li><li data-coord="prj2.umt:420:0"><p data-coord="prj2.umt:420:4">Implement the <samp data-coord="prj2.umt:420:18">add*()</samp> methods as wrappers which simply call the
+private methods but also take care of any validations not handled
+by the <samp data-coord="prj2.umt:420:150">validate()</samp> function.
+</p></li><li data-coord="prj2.umt:424:0"><p data-coord="prj2.umt:424:4">Implement the <samp data-coord="prj2.umt:424:18">findSensorType()</samp> and <samp data-coord="prj2.umt:424:41">findSensor()</samp> methods.
+They should largely be wrappers calling your private methods.
+</p></li><li data-coord="prj2.umt:427:0"><p data-coord="prj2.umt:427:4">Implement the <samp data-coord="prj2.umt:427:18">findSensorData()</samp> method. It too will call your
+private methods, but because of the non-standard use of
+<samp data-coord="prj2.umt:427:131">timestamp</samp>'s for paging through the data, this function is
+likely to contain non-trivial logic.
+</p></li><li data-coord="prj2.umt:432:0"><p data-coord="prj2.umt:432:4">Iterate until you meet all requirements.  
+</p></li></ol><p data-coord="prj2.umt:434:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When it is complete
+please follow the procedure given in the
+<em data-coord="prj2.umt:434:214"><a href="../../misc/github-setup/github-setup.html" data-coord="prj2.umt:434:214">github setup directions</a></em>
+to submit your project using the <samp data-coord="prj2.umt:434:273">submit</samp> directory.
+</p></section></section>
+    </div> <!-- #content -->
+  </body>
+</html>

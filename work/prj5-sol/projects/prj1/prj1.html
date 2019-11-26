@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 444/544: Project 1</title>
+    <link href="prj1/hl-fine_blue.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../.." class="material-icons">house</a></li>
+	<li><a href="../../docs">Docs</a></li>
+	<li><a href="../../exams-quizzes">Exams &amp; Quizzes</a></li>
+	<li><a href="../../exercises">Exercises</a></li>
+	<li><a href="../../hws">Homeworks</a></li>
+	<li><a href="../../misc">Misc</a></li>
+	<li><a href="../../projects">Projects</a></li>
+	<li><a href="../../slides">Slides</a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj1.umt:1:0"><h1 data-coord="prj1.umt:1:0">Project 1</h1><p data-coord="prj1.umt:3:0"><strong data-coord="prj1.umt:3:0">Due</strong>: Sep 15 by 11:59p
+</p><p data-coord="prj1.umt:5:0"><strong data-coord="prj1.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj1.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj1.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p><p data-coord="prj1.umt:9:0">This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  This is followed by a log
+which should help you understand the requirements.  Finally, it
+provides some hints as to how those requirements can be met.
+</p><section data-coord="prj1.umt:14:0"><h2 data-coord="prj1.umt:14:0">Aims</h2><p data-coord="prj1.umt:17:0">The aims of this project are as follows:
+</p><ul data-coord="prj1.umt:19:0"><li data-coord="prj1.umt:19:0"><p data-coord="prj1.umt:19:4">To ensure that you have set up your VM as specified in the
+<em data-coord="prj1.umt:19:118"><a href="../../misc/course-vm-setup/course-vm-setup.html" data-coord="prj1.umt:19:118">Course VM</a></em> and
+<em data-coord="prj1.umt:19:183"><a href="../../misc/github-setup/github-setup.html" data-coord="prj1.umt:19:183">Github Setup</a></em>
+documents.
+</p></li><li data-coord="prj1.umt:24:0"><p data-coord="prj1.umt:24:4">To get you to write a simple but non-trivial JavaScript program.
+</p></li><li data-coord="prj1.umt:26:0"><p data-coord="prj1.umt:26:4">To allow you to familiarize yourself with the programming
+environment you will be using in this course.
+</p></li><li data-coord="prj1.umt:29:0"><p data-coord="prj1.umt:29:4">To make you design an in-memory indexing scheme.
+</p></li></ul></section><section data-coord="prj1.umt:32:0"><h2 data-coord="prj1.umt:32:0">Background</h2><p data-coord="prj1.umt:35:0">This project involves reading and querying sensor data.  The data is
+organized in three levels:
+</p><ol data-coord="prj1.umt:38:0"><li data-coord="prj1.umt:38:0"><p data-coord="prj1.umt:38:4"><strong data-coord="prj1.umt:38:4">Sensor Types</strong>: A sensor type defines the information for a model
+of a sensor.  The information includes the <samp data-coord="prj1.umt:38:117">manufacturer</samp>,
+<samp data-coord="prj1.umt:38:137">modelNumber</samp>, the kind of <samp data-coord="prj1.umt:38:164">quantity</samp> measured, the <samp data-coord="prj1.umt:38:189">unit</samp> of
+measurement and the <samp data-coord="prj1.umt:38:223">max</samp> and <samp data-coord="prj1.umt:38:233">min</samp> <samp data-coord="prj1.umt:38:239">limits</samp> of the measurement.
+Note that any reading outside these <samp data-coord="prj1.umt:38:308">limits</samp> will necessarily be
+in <samp data-coord="prj1.umt:38:344">error</samp>.
+</p><p data-coord="prj1.umt:45:4">Each sensor type is assigned a unique <samp data-coord="prj1.umt:45:42">id</samp>.
+</p></li><li data-coord="prj1.umt:47:0"><p data-coord="prj1.umt:47:4"><strong data-coord="prj1.umt:47:4">Sensors</strong>: These are the actual sensors.  Each sensor has a
+specified sensor type.  The information includes the <samp data-coord="prj1.umt:47:121">model</samp> (the
+<samp data-coord="prj1.umt:47:138">id</samp> of the corresponding sensor type), the <samp data-coord="prj1.umt:47:182">period</samp> in seconds
+after which the sensor makes the next reading, and a <samp data-coord="prj1.umt:47:259">max</samp> and <samp data-coord="prj1.umt:47:269">min</samp> range
+of <samp data-coord="prj1.umt:47:288">expected</samp> values.  Note that any reading outside this <samp data-coord="prj1.umt:47:343">expected</samp> range
+will constitute an <samp data-coord="prj1.umt:47:383">outOfRange</samp> condition.
+</p><p data-coord="prj1.umt:54:4">Note that the <samp data-coord="prj1.umt:54:18">expected</samp> range of a sensor will be a sub-interval
+of the <samp data-coord="prj1.umt:54:81">limits</samp> of the corresponding sensor type.
+</p><p data-coord="prj1.umt:57:4">Each sensor is assigned a unique <samp data-coord="prj1.umt:57:37">id</samp>.
+</p></li><li data-coord="prj1.umt:59:0"><p data-coord="prj1.umt:59:4"><strong data-coord="prj1.umt:59:4">Sensor Data</strong> A stream of the data readings from the sensors.  Each
+reading consists of a <samp data-coord="prj1.umt:59:98">timestamp</samp>'d <samp data-coord="prj1.umt:59:112">value</samp> produced by a sensor
+identified by its <samp data-coord="prj1.umt:59:163">sensorId</samp>.
+</p><p data-coord="prj1.umt:63:4">Note that each reading can be classified as being in one
+of three states:
+</p><dl data-coord="prj1.umt:66:0"><dt data-coord="prj1.umt:66:6"> <samp data-coord="prj1.umt:66:1">error</samp> </dt><dd data-coord="prj1.umt:67:0"><p data-coord="prj1.umt:67:8">The <samp data-coord="prj1.umt:67:12">value</samp> of the reading is outside the limits of the
+sensor model.
+</p></dd><dt data-coord="prj1.umt:70:6"> <samp data-coord="prj1.umt:70:1">outOfRange</samp> </dt><dd data-coord="prj1.umt:71:0"><p data-coord="prj1.umt:71:8">The <samp data-coord="prj1.umt:71:12">value</samp> of the reading is outside the range <samp data-coord="prj1.umt:71:56">expected</samp>
+for the measuring sensor.
+</p></dd><dt data-coord="prj1.umt:74:6"> <samp data-coord="prj1.umt:74:1">ok</samp> </dt><dd data-coord="prj1.umt:75:0"><p data-coord="prj1.umt:75:7">The value of the reading is within the range of <samp data-coord="prj1.umt:75:55">expected</samp>
+values.
+</p></dd></dl><p data-coord="prj1.umt:78:4">It is <strong data-coord="prj1.umt:78:10">guaranteed</strong> that the time between two readings from the
+same sensor will be an exact multiple of the sensor's <samp data-coord="prj1.umt:78:125">period</samp>.
+</p></li></ol><p data-coord="prj1.umt:81:0">The data model should become absolutely clear after looking
+at the <em data-coord="prj1.umt:81:90"><a href="../../data/sensors/" data-coord="prj1.umt:81:90">provided data files</a></em>.
+</p></section><section data-coord="prj1.umt:85:0"><h2 data-coord="prj1.umt:85:0">Requirements</h2><p data-coord="prj1.umt:89:0">You must push a <samp data-coord="prj1.umt:89:16">submit/prj1-sol</samp> directory to your github
+repository such that typing <samp data-coord="prj1.umt:89:87">npm ci</samp> within that directory is
+sufficient to run the project using <samp data-coord="prj1.umt:89:157">./index.js</samp>.  
+</p><p data-coord="prj1.umt:93:0">You are being provided with an <samp data-coord="prj1.umt:93:31">index.js</samp> which provides the required
+command-line behavior.  What you specifically need to do is add code
+to the provided <a href="./prj1-sol/sensors.js?colorize=true" data-coord="prj1.umt:93:194">sensors.js</a> source file as per the requirements in that file.
+</p><p data-coord="prj1.umt:98:0">Additionally, your <samp data-coord="prj1.umt:98:19">submit/prj1-sol</samp> <strong data-coord="prj1.umt:98:37">must</strong> contain a <samp data-coord="prj1.umt:98:54">vm.png</samp>
+image file to verify that you have set up your VM correctly.  Specifically,
+the image must show a x2go client window running on your VM.  The captured
+x2go window must show a terminal window containing the output
+of the following commands:
+</p><pre data-coord="prj1.umt:105:0">$ hostname; hostname -I
+$ ls ~/git-repos
+$ ls ~/cs544
+$ ls ~/i?44
+$ crontab -l | tail -3
+</pre><p data-coord="prj1.umt:112:0">The behavior of the program is illustrated in this
+<em data-coord="prj1.umt:112:77"><a href="aux-files/interact.LOG" data-coord="prj1.umt:112:77">annotated log</a></em>.
+</p></section><section data-coord="prj1.umt:118:0"><h2 data-coord="prj1.umt:118:0">Provided Files</h2><p data-coord="prj1.umt:121:0">The <a href="./prj1-sol" data-coord="prj1.umt:121:18">prj1-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj1.umt:124:0"><dt data-coord="prj1.umt:124:4"> <a href="./prj1-sol/sensors.js?colorize=true" data-coord="prj1.umt:124:40">sensors.js</a></dt><dd data-coord="prj1.umt:125:0"><p data-coord="prj1.umt:125:6">This skeleton file constitutes the guts of your project.  You
+will need to flesh out the skeleton, adding code as per the
+documentation.  You should feel free to add any auxiliary
+function or method definitions as required.
+</p></dd><dt data-coord="prj1.umt:130:4"> <a href="./prj1-sol/index.js?colorize=true" data-coord="prj1.umt:130:38">index.js</a></dt><dd data-coord="prj1.umt:131:0"><p data-coord="prj1.umt:131:6">This file provides the complete command-line behavior which is
+required by your program.  It requires
+<a href="./prj1-sol/sensors.js?colorize=true" data-coord="prj1.umt:131:159">sensors.js.</a>  You <strong data-coord="prj1.umt:131:176">must
+      not</strong> modify this file; this ensures that your <samp data-coord="prj1.umt:131:234">Sensors</samp> class
+meets its specifications and facilitates automated testing by
+testing only the <samp data-coord="prj1.umt:131:341">Sensors</samp> API.
+</p></dd><dt data-coord="prj1.umt:138:4"> <a href="./prj1-sol/README" data-coord="prj1.umt:138:22">README</a></dt><dd data-coord="prj1.umt:139:0"><p data-coord="prj1.umt:139:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl><p data-coord="prj1.umt:146:0">Additionally, the <em data-coord="prj1.umt:146:41"><a href="../../data/sensors/" data-coord="prj1.umt:146:41">course data directory</a></em> contains
+sensor data files.
+</p></section><section data-coord="prj1.umt:149:0"><h2 data-coord="prj1.umt:149:0">Hints</h2><p data-coord="prj1.umt:152:0">You should feel free to use any of the functions from the standard
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" data-coord="prj1.umt:152:126">library;</a> in
+particular, functions provided by the
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" data-coord="prj1.umt:152:266">Array,</a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/" data-coord="prj1.umt:152:365">String,</a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" data-coord="prj1.umt:152:464">Number</a> and
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math" data-coord="prj1.umt:152:564">Math</a> objects useful.  You should not need to use any nodejs library
+functions (except possibly for
+<a href="https://nodejs.org/dist/latest-v10.x/docs/api/assert.html#assert_assert_value_message" data-coord="prj1.umt:152:752">assert())</a> or additional npm packages.
+</p><p data-coord="prj1.umt:167:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj1.umt:170:0"><li data-coord="prj1.umt:170:0"><p data-coord="prj1.umt:170:4">Set up your course VM as per the instructions specified in the
+<em data-coord="prj1.umt:170:122"><a href="../../misc/course-vm-setup/course-vm-setup.html" data-coord="prj1.umt:170:122">Course VM</a></em> and
+<em data-coord="prj1.umt:170:187"><a href="../../misc/github-setup/github-setup.html" data-coord="prj1.umt:170:187">Github</a></em> 
+documents.
+</p></li><li data-coord="prj1.umt:176:0"><p data-coord="prj1.umt:176:4">Read the project requirements thoroughly.  Look at the
+sample log to make sure you understand the necessary behavior.
+</p></li><li data-coord="prj1.umt:179:0"><p data-coord="prj1.umt:179:4">Look into debugging methods for your project.  Possibilities
+include:
+</p><ul data-coord="prj1.umt:182:0"><li data-coord="prj1.umt:182:0"><p data-coord="prj1.umt:182:8">Logging debugging information onto the terminal using
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/log" data-coord="prj1.umt:182:135">console.log()</a> or
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/Console/error" data-coord="prj1.umt:182:220">console.error().</a>
+</p></li><li data-coord="prj1.umt:188:0"><p data-coord="prj1.umt:188:8">Use the chrome debugger as outlined in this
+<a href="https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27" data-coord="prj1.umt:188:164">article.</a>
+</p></li></ul></li><li data-coord="prj1.umt:192:0"><p data-coord="prj1.umt:192:4">Consider what kind of indexing structure you will need to track
+the sensor information.  For each sensor, you will need to be able
+to access its sensor type and readings easily.  Since each sensor
+is an instance of its sensor type, you can consider using
+inheritance to model that relationship.
+</p><p data-coord="prj1.umt:198:4">When designing your indexing structure, you should first think in
+terms of abstract
+<em data-coord="prj1.umt:198:147"><a href="https://en.wikipedia.org/wiki/Associative_array" data-coord="prj1.umt:198:147">associative
+    arrays</a></em> and then consider possibilities for implementing these
+abstract associative arrays in JavaScript.  Possibilities:
+</p><ul data-coord="prj1.umt:204:0"><li data-coord="prj1.umt:204:0"><p data-coord="prj1.umt:204:9">Use standard JavaScript objects as associative arrays.
+Advantages include the ability to using simple <samp data-coord="prj1.umt:204:120">[]</samp>-based
+access and trivial JSON conversion for subsequent projects.
+Disadvantages include the lack of any defined order for
+property keys and the overhead of all the machinery
+associated with <samp data-coord="prj1.umt:204:351">Object</samp>'s like inheritance.
+</p></li><li data-coord="prj1.umt:211:0"><p data-coord="prj1.umt:211:9">Use the relatively new
+<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" data-coord="prj1.umt:211:138">Map</a> addition to the standard library.  An advantage of this
+approach is that it preserves insertion order.  It may also
+be lighter than the <samp data-coord="prj1.umt:211:296">Object</samp> alternative suggested above.
+Disadvantages include a clumsy API (<samp data-coord="prj1.umt:211:383">get()</samp> and <samp data-coord="prj1.umt:211:395">set()</samp>)
+and non-trivial work required for JSON conversion which may
+be useful for subsequent projects.
+</p></li></ul></li><li data-coord="prj1.umt:221:0"><p data-coord="prj1.umt:221:4">Start your project by creating a <samp data-coord="prj1.umt:221:37">work/prj1-sol</samp> directory in the
+<samp data-coord="prj1.umt:221:74">i444</samp> or <samp data-coord="prj1.umt:221:84">i544</samp> directory corresponding to your github
+repository.  Change into the newly created <samp data-coord="prj1.umt:221:177">prj1-sol</samp> directory
+and initialize your project by running <samp data-coord="prj1.umt:221:241">npm init -y</samp>.  This will
+create a <samp data-coord="prj1.umt:221:280">package.json</samp> file; this file should be committed to
+your repository.
+</p><p data-coord="prj1.umt:228:4">Run <samp data-coord="prj1.umt:228:8">npm install</samp>.  This should create a <samp data-coord="prj1.umt:228:45">package-lock.json</samp>.  Be
+sure to commit this lock file to your github repository too.
+</p></li><li data-coord="prj1.umt:231:0"><p data-coord="prj1.umt:231:4">Capture an image to validate that you have set up your course VM
+as instructed.  Within a terminal window in your <samp data-coord="prj1.umt:231:122">x2go</samp> client
+window, type in the following commands:
+</p><pre data-coord="prj1.umt:236:0">      $ hostname; hostname -I
+      $ ls ~/git-repos
+      $ ls ~/cs544
+      $ ls ~/i?44
+      $ crontab -l | tail -3
+</pre><p data-coord="prj1.umt:243:4">Use an image capture program on your workstation to capture an
+image of your <samp data-coord="prj1.umt:243:85">x2go</samp> client window into the file <samp data-coord="prj1.umt:243:120">vm.png</samp> in your
+<samp data-coord="prj1.umt:243:141">work/prj1-sol</samp> directory.  The captured image should clearly
+shows the terminal window containing the output of the above
+commands.
+</p></li><li data-coord="prj1.umt:249:0"><p data-coord="prj1.umt:249:4">Copy the provided files into your project directory:
+</p><pre data-coord="prj1.umt:252:0">    $ cp -p $HOME/cs544/projects/prj1/prj1-sol/* .
+</pre><p data-coord="prj1.umt:255:4">This should copy the <samp data-coord="prj1.umt:255:25">README</samp> template, the <samp data-coord="prj1.umt:255:48">index.js</samp> and the
+<samp data-coord="prj1.umt:255:71">sensors.js</samp> skeleton file into your project directory.
+</p></li><li data-coord="prj1.umt:258:0"><p data-coord="prj1.umt:258:4">You should be able to run the project, but all commands will
+return without any results until you replace the @TODO sections
+with suitable code.
+</p><pre data-coord="prj1.umt:264:0">    $ ./index.js #show usage message
+    $ DATA=$HOME/cs544/data/sensors
+    $ ./index.js $DATA
+    add   sensor-type|sensor|sensor-data NAME=VALUE...
+    clear clear all sensor data
+    ...
+    load  sensor-type|sensor|sensor-data JSON_FILE
+    &gt;&gt; find sensor-data sensorId=22
+    &gt;&gt;
+</pre></li><li data-coord="prj1.umt:277:0"><p data-coord="prj1.umt:277:4">Replace the <samp data-coord="prj1.umt:277:16">XXX</samp> entries in the <samp data-coord="prj1.umt:277:37">README</samp> template.
+</p></li><li data-coord="prj1.umt:280:0"><p data-coord="prj1.umt:280:4">Commit your project to github:
+</p><pre data-coord="prj1.umt:283:0">    $ git add .
+    $ git commit -a -m 'started prj1'
+</pre></li><li data-coord="prj1.umt:287:0"><p data-coord="prj1.umt:287:4">Open the copy of the <samp data-coord="prj1.umt:287:25">sensors.js</samp> file in your project directory.
+It contains
+</p><ol data-coord="prj1.umt:290:0"><li data-coord="prj1.umt:290:0"><p data-coord="prj1.umt:290:9">A <samp data-coord="prj1.umt:290:11">strict</samp> declaration.
+</p></li><li data-coord="prj1.umt:292:0"><p data-coord="prj1.umt:292:8">A skeleton <samp data-coord="prj1.umt:292:19">Sensors</samp> <samp data-coord="prj1.umt:292:29">class</samp> definition with <samp data-coord="prj1.umt:292:53">@TODO</samp> comments.
+The comments and <samp data-coord="prj1.umt:292:95">FN_INFOS</samp> table at the end of the file
+specify the behavior of the methods you need to complete.
+</p><p data-coord="prj1.umt:296:8">Note that the <samp data-coord="prj1.umt:296:22">class</samp> syntax is a recent addition to
+JavaScript and is syntactic sugar around JavaScript's more
+flexible object model.  Note that even though the use of this
+<samp data-coord="prj1.umt:296:206">class</samp> syntax may make students with a background in
+class-based OOPL's feel more comfortable, there are some
+differences worth pointing out:
+</p><ul data-coord="prj1.umt:303:0"><li data-coord="prj1.umt:303:0"><p data-coord="prj1.umt:303:12">No data members can be defined within the <samp data-coord="prj1.umt:303:54">class</samp> body.
+All "instance variables" must be referenced through the
+<samp data-coord="prj1.umt:303:135">this</samp> pseudo-variable in both <samp data-coord="prj1.umt:303:166">constructor</samp> and
+methods.  For example, if we want to initialize an
+instance variable <samp data-coord="prj1.umt:303:263">sensorTypes</samp> in the <samp data-coord="prj1.umt:303:284">constructor()</samp> we may
+have a statement like:
+</p><pre>            <span class="hl kwa">this</span><span class="hl opt">.</span>sensorTypes <span class="hl opt">= {};</span></pre></li><li data-coord="prj1.umt:314:0"><p data-coord="prj1.umt:314:12">There is no implicit <samp data-coord="prj1.umt:314:33">this</samp>.  If an instance method
+needs to call another instance method of the same object, the
+method <strong data-coord="prj1.umt:314:143">must</strong> be called through <samp data-coord="prj1.umt:314:168">this</samp>.
+</p></li><li data-coord="prj1.umt:318:0"><p data-coord="prj1.umt:318:12">There is no easy way to get private methods or data.
+Instead a convention which is often used is to 
+prefix private names with something like a underscore
+and trust <samp data-coord="prj1.umt:318:192">class</samp> clients to not misuse those names.
+</p></li></ul></li><li data-coord="prj1.umt:323:0"><p data-coord="prj1.umt:323:8">An assignment of the <samp data-coord="prj1.umt:323:29">Sensors</samp> <samp data-coord="prj1.umt:323:39">class</samp> to <samp data-coord="prj1.umt:323:50">module.exports</samp>.
+This makes <samp data-coord="prj1.umt:323:87">Sensors</samp> the only declarations available outside
+the <samp data-coord="prj1.umt:323:149">sensors.js</samp> file; all other declarations are local to the
+file.
+</p></li><li data-coord="prj1.umt:328:0"><p data-coord="prj1.umt:328:8">Validation code.  This code checks for required values,
+converts strings to numbers as necessary and inserts default
+values.  The validation is driven by the <samp data-coord="prj1.umt:328:182">FN_INFOS</samp> table
+towards the end of the file.  Note that though this generic
+validation takes care of most of your validation
+needs, you will still need some additional validation.
+</p></li></ol><p data-coord="prj1.umt:335:4">Some points worth making about the provided code:
+</p><ul data-coord="prj1.umt:337:0"><li data-coord="prj1.umt:337:0"><p data-coord="prj1.umt:337:8">All the methods have been declared <samp data-coord="prj1.umt:337:43">async</samp>.  This is not
+needed for this project, but will be necessary for subsequent
+projects.  You can safely ignore the <samp data-coord="prj1.umt:337:173">async</samp> declarations and
+write code normally.
+</p></li><li data-coord="prj1.umt:342:0"><p data-coord="prj1.umt:342:8">For error handling, the convention used is that all user
+errors should be thrown as lists of objects (for example,
+see the <samp data-coord="prj1.umt:342:140">throw</samp> at the end of the <samp data-coord="prj1.umt:342:166">validate()</samp> function).
+If you need to <samp data-coord="prj1.umt:342:206">throw</samp> your own errors, be sure to wrap
+them in a list.  Do so even for a single error:
+</p><pre>        <span class="hl kwa">if</span> <span class="hl opt">(!</span>sensorTypes<span class="hl opt">[</span>model<span class="hl opt">]) {</span>
+          <span class="hl kwa">throw</span> <span class="hl opt">[</span> `no model $<span class="hl opt">{</span>model<span class="hl opt">}</span> sensor type` <span class="hl opt">];</span>
+        <span class="hl opt">}</span></pre><p data-coord="prj1.umt:354:8">This allows the calling code to distinguish between
+exceptions caused by intentional error reporting and
+those caused inadvertently, allowing the former
+to be reported as simple error messages whereas the
+latter will be reported with a full stack trace.  This
+makes it much easier to debug your code when you get
+unintentional exceptions.
+</p></li><li data-coord="prj1.umt:362:0"><p data-coord="prj1.umt:362:8">The code should assume that the property values in the
+incoming <samp data-coord="prj1.umt:362:80">info</samp> object which is the argument to the methods in
+<samp data-coord="prj1.umt:362:142">Sensors</samp> <strong data-coord="prj1.umt:362:152">can</strong> be <samp data-coord="prj1.umt:362:161">String</samp>'s, even when the corresponding
+property is expected to be a number or integer.  For example,
+a sensor reading may come in as:
+</p><pre>        <span class="hl opt">{ ...</span>
+          value<span class="hl opt">:</span> <span class="hl str">&quot;123&quot;</span><span class="hl opt">,</span>
+          <span class="hl opt">...</span>
+        <span class="hl opt">}</span></pre><p data-coord="prj1.umt:375:1">This assumption makes it easy to interface with dumb
+form interfaces (or a dumb cli program for this project).
+</p><p data-coord="prj1.umt:378:1">Note that it is also permissible for incoming property
+values to be numbers as in:
+</p><pre>        <span class="hl opt">{ ...</span>
+          value<span class="hl opt">:</span> <span class="hl num">123</span><span class="hl opt">,</span>
+          <span class="hl opt">...</span>
+        <span class="hl opt">}</span></pre><p data-coord="prj1.umt:388:1">Both of these possibilities are handled correctly by the
+provided validation code.  In both cases, the validation
+code return value will contain the property as a <samp data-coord="prj1.umt:388:166">Number</samp>.
+</p></li><li data-coord="prj1.umt:392:0"><p data-coord="prj1.umt:392:8">In contrast to the previous point, any number-valued
+properties in the return values of the <samp data-coord="prj1.umt:392:108">Sensors</samp> methods
+should be JavaScript <samp data-coord="prj1.umt:392:155">Number</samp>'s.
+</p></li></ul></li><li data-coord="prj1.umt:396:0"><p data-coord="prj1.umt:396:4">Add initialization code to your <samp data-coord="prj1.umt:396:36">constructor()</samp>.  It is possible
+that you will need to execute the same code in your <samp data-coord="prj1.umt:396:125">clear()</samp>
+method; in that case, you can simply have your constructor
+call your <samp data-coord="prj1.umt:396:212">clear()</samp> method (using <samp data-coord="prj1.umt:396:236">this.clear()</samp>).
+</p></li><li data-coord="prj1.umt:401:0"><p data-coord="prj1.umt:401:4">Add any utility functions or methods which may be useful.  One
+possiblity would be an <samp data-coord="prj1.umt:401:94">inRange(value, range)</samp> method which
+returns truthy iff <samp data-coord="prj1.umt:401:154">range.min &lt;= value &lt;= range.max</samp>.  This
+can be useful in classifying the status of a sensor reading.
+</p></li><li data-coord="prj1.umt:406:0"><p data-coord="prj1.umt:406:4">The <samp data-coord="prj1.umt:406:8">add*()</samp> methods should be relatively trivial (YMMV
+depending on the details of your indexing structure).
+Implement the <samp data-coord="prj1.umt:406:136">addSensorType()</samp> method.  Test using
+the provided <samp data-coord="prj1.umt:406:191">$DATA/sensor-types.json</samp> file.  Using
+a debugger or <samp data-coord="prj1.umt:406:248">console.log()</samp> verify that you have
+indeed captured the data.  Check for error handling
+using <samp data-coord="prj1.umt:406:351">$DATA/err-sensor-types.json</samp>.
+</p></li><li data-coord="prj1.umt:414:0"><p data-coord="prj1.umt:414:4">Implement the <samp data-coord="prj1.umt:414:18">addSensor()</samp> method.  You will need
+to validate that the sensor <samp data-coord="prj1.umt:414:87">model</samp> is a valid
+sensor type id.
+</p></li><li data-coord="prj1.umt:418:0"><p data-coord="prj1.umt:418:4">Implement the <samp data-coord="prj1.umt:418:18">addSensorData()</samp> method.  You will need to validate
+that the id specified by the incoming <samp data-coord="prj1.umt:418:113">sensorId</samp> is a valid sensor
+id.
+</p></li><li data-coord="prj1.umt:422:0"><p data-coord="prj1.umt:422:4">Start implementing the <samp data-coord="prj1.umt:422:27">findSensorType()</samp> method.  There are two
+cases to consider:
+</p><ol data-coord="prj1.umt:425:0"><li data-coord="prj1.umt:425:0"><p data-coord="prj1.umt:425:8">There is a truthy incoming <samp data-coord="prj1.umt:425:35">id</samp> property.  In this case, you
+should simply return the single matching sensor type or report
+some kind of not found error.
+</p></li><li data-coord="prj1.umt:429:0"><p data-coord="prj1.umt:429:8">There is no truthy incoming <samp data-coord="prj1.umt:429:36">id</samp> property.  After the default
+processing of the <samp data-coord="prj1.umt:429:96">validate()</samp> function, its return value is
+guaranteed to have <samp data-coord="prj1.umt:429:166">index</samp> and <samp data-coord="prj1.umt:429:178">count</samp> properties.  Ignoring
+possible filter parameters, simply extract sensor types for
+the specified <samp data-coord="prj1.umt:429:298">index</samp> and <samp data-coord="prj1.umt:429:310">count</samp>.  Test.
+</p><p data-coord="prj1.umt:435:8">Now add support for filter parameters.  Test using
+filters like <samp data-coord="prj1.umt:435:73">manufacturer</samp> or <samp data-coord="prj1.umt:435:91">quantity</samp>.
+</p></li></ol></li><li data-coord="prj1.umt:438:0"><p data-coord="prj1.umt:438:4">Implement <samp data-coord="prj1.umt:438:14">findSensor()</samp> along the lines of <samp data-coord="prj1.umt:438:48">findSensorType()</samp>.
+There should be a lot of common functionality between the two;
+refactor your code so as to share the common functionality.
+</p></li><li data-coord="prj1.umt:442:0"><p data-coord="prj1.umt:442:4">Implement <samp data-coord="prj1.umt:442:14">findSensorData()</samp>.  This may be the hardest part of
+this project, but you should have already thought this through
+when you designed your indexing structure.
+</p></li><li data-coord="prj1.umt:446:0"><p data-coord="prj1.umt:446:4">Iterate until you meet all requirements.  
+</p></li></ol><p data-coord="prj1.umt:448:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When it is complete
+please follow the procedure given in the
+<em data-coord="prj1.umt:448:214"><a href="../../misc/github-setup/github-setup.html" data-coord="prj1.umt:448:214">github setup directions</a></em>
+to submit your project using the <samp data-coord="prj1.umt:448:273">submit</samp> directory.
+</p></section></section>
+    </div> <!-- #content -->
+  </body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+    <title>CS 444/544: Project 3</title>
+    
+  </head>
+  <body>
+    <nav>
+      <ul>
+	<li><a href="../.." class="material-icons">house</a></li>
+	<li><a href="../../docs">Docs</a></li>
+	<li><a href="../../exams-quizzes">Exams &amp; Quizzes</a></li>
+	<li><a href="../../exercises">Exercises</a></li>
+	<li><a href="../../hws">Homeworks</a></li>
+	<li><a href="../../misc">Misc</a></li>
+	<li><a href="../../projects">Projects</a></li>
+	<li><a href="../../slides">Slides</a></li>
+      </ul>
+    </nav>
+    <div class="content">
+      <section data-coord="prj3.umt:1:0"><h1 data-coord="prj3.umt:1:0">Project 3</h1><p data-coord="prj3.umt:3:0"><strong data-coord="prj3.umt:3:0">Due</strong>: Oct 30 by 11:59p
+</p><p data-coord="prj3.umt:5:0"><strong data-coord="prj3.umt:5:0">Important Reminder</strong>: As per the course <em data-coord="prj3.umt:5:110"><a href="../../misc/academic-honesty-statement/academic-honesty-policy.html" data-coord="prj3.umt:5:110">Academic Honesty Statement</a></em>,
+cheating of any kind will minimally result in receiving an F letter
+grade for the entire course.
+</p><p data-coord="prj3.umt:9:0">This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  This is followed by a log
+which should help you understand the requirements.  Finally, it
+provides some hints as to how those requirements can be met.
+</p><section data-coord="prj3.umt:14:0"><h2 data-coord="prj3.umt:14:0">Aims</h2><p data-coord="prj3.umt:17:0">The aims of this project are as follows:
+</p><ul data-coord="prj3.umt:19:0"><li data-coord="prj3.umt:19:0"><p data-coord="prj3.umt:19:4">To introduce you to building web services.
+</p></li><li data-coord="prj3.umt:21:0"><p data-coord="prj3.umt:21:4">To give you some familiarity with using the express.js web framework.
+</p></li></ul></section><section data-coord="prj3.umt:24:0"><h2 data-coord="prj3.umt:24:0">Requirements</h2><p data-coord="prj3.umt:28:0">You must push a <samp data-coord="prj3.umt:28:16">submit/prj3-sol</samp> directory to your github
+repository such that typing <samp data-coord="prj3.umt:28:87">npm ci</samp> within that directory is
+sufficient to run the project using <samp data-coord="prj3.umt:28:157">./index.js</samp>.  
+</p><p data-coord="prj3.umt:32:0">You are being provided with an <samp data-coord="prj3.umt:32:31">index.js</samp> which provides the required
+command-line behavior to start the program:
+</p><pre data-coord="prj3.umt:36:0">$ ./index.js PORT MONGO_DB_URL \
+   [ SENSOR_TYPES_JSON SENSORS_JSON SENSOR_DATA_JSON ]
+</pre><p data-coord="prj3.umt:40:0">where the arguments are:
+</p><dl data-coord="prj3.umt:42:0"><dt data-coord="prj3.umt:42:2"> <samp data-coord="prj3.umt:42:1">PORT</samp> </dt><dd data-coord="prj3.umt:43:0"><p data-coord="prj3.umt:43:4">This required argument is the port at which the program listens
+for web requests.
+</p></dd><dt data-coord="prj3.umt:46:2"> <samp data-coord="prj3.umt:46:1">MONGO_DB_URL</samp> </dt><dd data-coord="prj3.umt:47:0"><p data-coord="prj3.umt:47:4">This required argument is the url specifying the mongo database
+to be used by the program.
+</p></dd><dt data-coord="prj3.umt:50:2"> <samp data-coord="prj3.umt:50:1">SENSOR_TYPES_JSON SENSORS_JSON SENSOR_DATA_JSON</samp> </dt><dd data-coord="prj3.umt:51:0"><p data-coord="prj3.umt:51:4">These three optional arguments specify the path to files containing
+JSON data representing the sensor types, sensors and sensor data
+respectively.  If present, the data in the specified database is
+replaced by the data in these files.
+</p></dd></dl><p data-coord="prj3.umt:56:0">What you specifically need to do is add code to the provided
+<a href="./prj3-sol/sensors-ws.js?colorize=true" data-coord="prj3.umt:56:103">sensors-ws.js</a> such that your
+server recognizes the following 9 HTTP requests:
+</p><dl data-coord="prj3.umt:60:0"><dt data-coord="prj3.umt:60:2"> <samp data-coord="prj3.umt:60:1">GET</samp> <samp data-coord="prj3.umt:60:7">/sensor-types</samp> and <samp data-coord="prj3.umt:60:27">GET</samp> <samp data-coord="prj3.umt:60:33">/sensors</samp> </dt><dd data-coord="prj3.umt:61:0"><p data-coord="prj3.umt:61:4">The above URLs may include an optional query string.  The
+following meta-parameters should be recognized within the query
+string:
+</p><dl data-coord="prj3.umt:65:0"><dt data-coord="prj3.umt:65:6"> <samp data-coord="prj3.umt:65:1">_index</samp> </dt><dd data-coord="prj3.umt:66:0"><p data-coord="prj3.umt:66:8">The starting index of the first returned data item (default 0).
+</p></dd><dt data-coord="prj3.umt:68:6"> <samp data-coord="prj3.umt:68:1">_count</samp> </dt><dd data-coord="prj3.umt:69:0"><p data-coord="prj3.umt:69:8">Maximum number of data items to be returned (default 5).
+</p></dd><dt data-coord="prj3.umt:71:6"> <samp data-coord="prj3.umt:71:1">_doDetail</samp> </dt><dd data-coord="prj3.umt:72:0"><p data-coord="prj3.umt:72:8">This query parameter is meaningful only for the <samp data-coord="prj3.umt:72:56">/sensors</samp> URL.
+If specified, then each returned sensor data item should have
+a <samp data-coord="prj3.umt:72:138">sensorType</samp> property giving information about its sensor
+type.
+</p></dd></dl><p data-coord="prj3.umt:77:4">Any additional query parameters should act as filter parameters to
+filter the returned data items.  Specifically, a returned data
+item must have properties with values identical to those specified
+for the filter query parameters.
+</p><p data-coord="prj3.umt:82:4">A successful request at these urls should return a JSON
+representation of a JavaScript object having the following fields:
+</p><dl data-coord="prj3.umt:85:0"><dt data-coord="prj3.umt:85:4"> <samp data-coord="prj3.umt:85:1">data</samp> </dt><dd data-coord="prj3.umt:86:0"><p data-coord="prj3.umt:86:6">This property is required.  If the URL is <samp data-coord="prj3.umt:86:48">/sensor-types</samp>, then
+<samp data-coord="prj3.umt:86:76">data</samp> should give a list of sensor-type items.  If the URL is
+<samp data-coord="prj3.umt:86:145">/sensors</samp> then <samp data-coord="prj3.umt:86:161">data</samp> should give a list of sensor-type items.
+Exactly what goes into a data item depends on the properties
+stored for a sensor-type or sensor, but minimally they should
+include the following properties:
+</p><dl data-coord="prj3.umt:93:0"><dt data-coord="prj3.umt:93:8"> <samp data-coord="prj3.umt:93:1">id</samp> </dt><dd data-coord="prj3.umt:94:0"><p data-coord="prj3.umt:94:3">A unique ID for the sensor-type or sensor.  The data items
+should be sorted in ascending lexicographical order by <samp data-coord="prj3.umt:94:120">id</samp>.
+</p></dd><dt data-coord="prj3.umt:97:8"> <samp data-coord="prj3.umt:97:1">self</samp> </dt><dd data-coord="prj3.umt:98:0"><p data-coord="prj3.umt:98:3">This should specify a URL which will return a result containing
+that exact item.
+</p></dd></dl></dd><dt data-coord="prj3.umt:101:4"> <samp data-coord="prj3.umt:101:1">self</samp> </dt><dd data-coord="prj3.umt:102:0"><p data-coord="prj3.umt:102:6">This property is required and should specify a URL which will
+return exactly the same results.
+</p></dd><dt data-coord="prj3.umt:105:4"> <samp data-coord="prj3.umt:105:1">next</samp> </dt><dd data-coord="prj3.umt:106:0"><p data-coord="prj3.umt:106:6">This property is optional, but should be specified when there
+is a possibility for more results.  If specified, it should specify a 
+URL which will return the next batch of results for the same query.
+</p></dd><dt data-coord="prj3.umt:110:4"> <samp data-coord="prj3.umt:110:1">prev</samp> </dt><dd data-coord="prj3.umt:111:0"><p data-coord="prj3.umt:111:6">This property is optional, but should be specified when there
+is a possibility for earlier results.  If specified, it should specify a 
+URL which will return the previous batch of results for the same query.
+</p></dd></dl><p data-coord="prj3.umt:115:4">The <samp data-coord="prj3.umt:115:8">next</samp> and <samp data-coord="prj3.umt:115:19">prev</samp> URLs allow a client to go back-and-forth
+within the returned results.
+</p><p data-coord="prj3.umt:118:4">If there are no results for a particular combination of filter
+parameters, then except for one case, the request should succeed
+with the <samp data-coord="prj3.umt:118:149">data</samp> property returned as an empty list.  The
+exceptional case is when an <samp data-coord="prj3.umt:118:229">id</samp> is specified as a query parameter
+and there are no results.  In that case, the request should fail
+with a <samp data-coord="prj3.umt:118:348">404 NOT_FOUND</samp> HTTP status code and the returned JSON
+object should contain a suitable <samp data-coord="prj3.umt:118:440">errors</samp> list as defined below.
+</p></dd><dt data-coord="prj3.umt:126:2"> <samp data-coord="prj3.umt:126:1">GET</samp> <samp data-coord="prj3.umt:126:7">/sensor-types/</samp><em data-coord="prj3.umt:126:27">ID</em> and <samp data-coord="prj3.umt:126:36">GET</samp> <samp data-coord="prj3.umt:126:42">/sensors/</samp><em data-coord="prj3.umt:126:57">ID</em> </dt><dd data-coord="prj3.umt:127:0"><p data-coord="prj3.umt:127:4">The behavior of these requests should be similar to the earlier
+requests except that a success result should contain exactly one
+data item with an <samp data-coord="prj3.umt:127:159">id</samp> property matching <em data-coord="prj3.umt:127:182">ID</em>.  The entire
+result as well as the single data item should both have
+<samp data-coord="prj3.umt:127:264">self</samp> URLs.  There should not be any <samp data-coord="prj3.umt:127:302">next</samp> and <samp data-coord="prj3.umt:127:313">prev</samp> URLs
+as they do not make sense when only a single data item is
+expected.
+</p><p data-coord="prj3.umt:135:4">When there are no results, these requests should fail with a <samp data-coord="prj3.umt:135:65">404
+    NOT_FOUND</samp> HTTP status code and the returned JSON object should
+contain a suitable <samp data-coord="prj3.umt:135:161">errors</samp> list as defined below.
+</p></dd><dt data-coord="prj3.umt:139:2"> <samp data-coord="prj3.umt:139:1">POST</samp> <samp data-coord="prj3.umt:139:8">/sensor-types</samp> and <samp data-coord="prj3.umt:139:28">POST</samp> <samp data-coord="prj3.umt:139:35">/sensors</samp> </dt><dd data-coord="prj3.umt:140:0"><p data-coord="prj3.umt:140:4">These requests should be made with a JSON body specifying a
+sensor-type or sensor object which is to be added or replaced.
+The exact properties in the object being <samp data-coord="prj3.umt:140:176">POST</samp>ed will depend on
+the <em data-coord="prj3.umt:140:229"><a href="../prj1/prj1.html" data-coord="prj3.umt:140:229">data model</a></em>, but should minimally
+include an <samp data-coord="prj3.umt:140:279">id</samp> property.
+</p><p data-coord="prj3.umt:146:4">A successful result should result in a <samp data-coord="prj3.umt:146:43">201 CREATED</samp> HTTP
+response.  The response headers must include a <samp data-coord="prj3.umt:146:113">Location</samp> header
+specifying a URL at which the newly created or replaced resource
+may be accessed.
+</p></dd><dt data-coord="prj3.umt:151:2"> <samp data-coord="prj3.umt:151:1">GET</samp> <samp data-coord="prj3.umt:151:7">/sensor-data/</samp><em data-coord="prj3.umt:151:26">SENSOR_ID</em> </dt><dd data-coord="prj3.umt:152:0"><p data-coord="prj3.umt:152:4">The above URL may include an optional query string.  The
+following parameters should be recognized within the query
+string:
+</p><dl data-coord="prj3.umt:156:0"><dt data-coord="prj3.umt:156:6"> <samp data-coord="prj3.umt:156:1">_count</samp> </dt><dd data-coord="prj3.umt:157:0"><p data-coord="prj3.umt:157:8">This meta-parameter gives the maximum number of data items to
+be returned (default 5).
+</p></dd><dt data-coord="prj3.umt:160:6"> <samp data-coord="prj3.umt:160:1">_doDetail</samp> </dt><dd data-coord="prj3.umt:161:0"><p data-coord="prj3.umt:161:1">If this meta-parameter is specified, then the returned object
+should have <samp data-coord="prj3.umt:161:76">sensor</samp> and <samp data-coord="prj3.umt:161:89">sensorType</samp> properties giving
+details about the sensor and sensor-type producing the
+sensor-data.
+</p></dd><dt data-coord="prj3.umt:166:6"> <samp data-coord="prj3.umt:166:1">timestamp</samp> </dt><dd data-coord="prj3.umt:167:0"><p data-coord="prj3.umt:167:8">This query parameter specifies an upper-bound on the timestamp
+of returned sensor-data items.  If not specified, then
+it will default to the latest timestamp associated with
+the sensor specified by <em data-coord="prj3.umt:167:216">SENSOR_ID</em>.
+</p></dd><dt data-coord="prj3.umt:172:6"> <samp data-coord="prj3.umt:172:1">statuses</samp> </dt><dd data-coord="prj3.umt:173:0"><p data-coord="prj3.umt:173:8">This can be specified as <samp data-coord="prj3.umt:173:33">ok</samp>, <samp data-coord="prj3.umt:173:39">outOfRange</samp>, <samp data-coord="prj3.umt:173:53">error</samp> or <samp data-coord="prj3.umt:173:64">all</samp>
+with meaning as specified in <em data-coord="prj3.umt:173:121"><a href="../prj1/prj1.html" data-coord="prj3.umt:173:121">Project 1</a></em>.
+It should default to <samp data-coord="prj3.umt:173:156">ok</samp>.
+</p></dd></dl><p data-coord="prj3.umt:177:4">Other query parameters serve as filter query parameters to filter
+the returned data items.  Specifically, a returned data item must
+have properties with values identical to those specified for the
+filter query parameters.
+</p><p data-coord="prj3.umt:182:4">A successful request at these urls should return a JSON
+representation of a JavaScript object having the following fields:
+</p><dl data-coord="prj3.umt:185:0"><dt data-coord="prj3.umt:185:4"> <samp data-coord="prj3.umt:185:1">data</samp> </dt><dd data-coord="prj3.umt:186:0"><p data-coord="prj3.umt:186:6">This property is required and will be a list of sensor-data
+items for the specified <em data-coord="prj3.umt:186:96">SENSOR_ID</em>.  Each item must have a
+<samp data-coord="prj3.umt:186:138">timestamp</samp> property giving the time of the reading with the
+items sorted in descending order by <samp data-coord="prj3.umt:186:241">timestamp</samp>, a <samp data-coord="prj3.umt:186:256">value</samp>
+property giving the value of the sensor reading and a <samp data-coord="prj3.umt:186:324">status</samp>
+property specifying whether the reading was <samp data-coord="prj3.umt:186:383">ok</samp>, <samp data-coord="prj3.umt:186:389">outOfRange</samp>
+or <samp data-coord="prj3.umt:186:411">error</samp> as specified in <em data-coord="prj3.umt:186:456"><a href="../prj1/prj1.html" data-coord="prj3.umt:186:456">Project 1</a></em>.
+Additionally, each item must have a <samp data-coord="prj3.umt:186:511">self</samp> URL.
+</p></dd><dt data-coord="prj3.umt:195:4"> <samp data-coord="prj3.umt:195:1">self</samp> </dt><dd data-coord="prj3.umt:196:0"><p data-coord="prj3.umt:196:6">This property is required and should specify a URL which will
+return exactly the same results.
+</p></dd></dl><p data-coord="prj3.umt:199:4">If there are no results for a particular combination of filter
+parameters, then the request should succeed with the <samp data-coord="prj3.umt:199:124">data</samp>
+property returned as an empty list.  OTOH, if the <em data-coord="prj3.umt:199:185">SENSOR_ID</em> is
+invalid, then the request should fail with a <samp data-coord="prj3.umt:199:249">404 NOT_FOUND</samp> HTTP
+status code and the returned JSON object should contain a suitable
+<samp data-coord="prj3.umt:199:345">errors</samp> list as defined below.
+</p></dd><dt data-coord="prj3.umt:207:2"> <samp data-coord="prj3.umt:207:1">GET</samp> <samp data-coord="prj3.umt:207:7">/sensor-data/</samp><em data-coord="prj3.umt:207:26">SENSOR_ID</em><samp data-coord="prj3.umt:207:41">/</samp><em data-coord="prj3.umt:207:48">TIMESTAMP</em> </dt><dd data-coord="prj3.umt:208:0"><p data-coord="prj3.umt:208:4">The behavior of this request should be very similar to the earlier
+request except that a success result should contain exactly one
+data item with a <samp data-coord="prj3.umt:208:160">timestamp</samp> property matching <em data-coord="prj3.umt:208:190">TIMESTAMP</em>.
+The returned sensor-data can have any <samp data-coord="prj3.umt:208:245">status</samp>; i.e., unlike
+the earlier request <samp data-coord="prj3.umt:208:292">statuses</samp> defaults to <samp data-coord="prj3.umt:208:315">all</samp>.
+</p><p data-coord="prj3.umt:214:4">The entire result as well as the single data item should both have
+<samp data-coord="prj3.umt:214:75">self</samp> URLs.  
+</p><p data-coord="prj3.umt:217:4">When there are no results because of a non-existent <em data-coord="prj3.umt:217:56">SENSOR_ID</em> or
+<em data-coord="prj3.umt:217:75">TIMESTAMP</em> this request should fail with a <samp data-coord="prj3.umt:217:119">404 NOT_FOUND</samp> HTTP
+status code and the returned JSON object should contain a suitable
+<samp data-coord="prj3.umt:217:215">errors</samp> list as defined below.
+</p></dd><dt data-coord="prj3.umt:222:2"> <samp data-coord="prj3.umt:222:1">POST</samp> <samp data-coord="prj3.umt:222:8">/sensor-data/</samp><em data-coord="prj3.umt:222:27">SENSOR_ID</em> </dt><dd data-coord="prj3.umt:223:0"><p data-coord="prj3.umt:223:4">This requests should be made with a JSON body specifying a reading
+for sensor <em data-coord="prj3.umt:223:86">SENSOR_ID</em> which is to be added or replaced.  The
+object being <samp data-coord="prj3.umt:223:154">POST</samp>ed must include a <samp data-coord="prj3.umt:223:178">timestamp</samp> and <samp data-coord="prj3.umt:223:194">value</samp>
+properties which meet the restrictions of the data model.
+</p><p data-coord="prj3.umt:228:4">A successful result should result in a <samp data-coord="prj3.umt:228:43">201 CREATED</samp> HTTP
+response without any body.  The response headers must include a
+<samp data-coord="prj3.umt:228:134">Location</samp> header specifying a URL at which the newly created or
+replaced resource may be accessed.
+</p></dd></dl><p data-coord="prj3.umt:233:0"><strong data-coord="prj3.umt:233:0">Errors</strong>: If a request fails, then the returned response should have a
+suitable HTTP status code.  The body for the error response should be
+the JSON representation of an object containing an <samp data-coord="prj3.umt:233:192">errors</samp> property
+which should specify a non-empty list of error objects.  Each error
+object should have <samp data-coord="prj3.umt:233:297">code</samp> and <samp data-coord="prj3.umt:233:308">message</samp> properties, where <samp data-coord="prj3.umt:233:336">code</samp> is a
+brief code describing the error and <samp data-coord="prj3.umt:233:384">message</samp> is a possibly
+context-dependent description of the error.
+</p><p data-coord="prj3.umt:241:0">If the client accesses a URL different from any of those documented
+above, then the default error behavior provided by the web server
+framework is acceptable.
+</p><p data-coord="prj3.umt:245:0">Additionally, the program should also log a suitable internal error
+object on standard error; this error object can contain internal
+details not exposed to the web service.
+</p><p data-coord="prj3.umt:249:0">The behavior of the program is illustrated in this
+<em data-coord="prj3.umt:249:76"><a href="aux-files/sensors.LOG" data-coord="prj3.umt:249:76">annotated log</a></em>.  Additionally, a working
+version of the project is available at
+<em data-coord="prj3.umt:249:191"><a href="http://zdu.binghamton.edu:2345" data-coord="prj3.umt:249:191">&lt;http://zdu.binghamton.edu:2345&gt;</a></em> (note that this URL will only
+work from within the campus network).
+</p></section><section data-coord="prj3.umt:258:0"><h2 data-coord="prj3.umt:258:0">Provided Files</h2><p data-coord="prj3.umt:261:0">The <a href="./prj3-sol" data-coord="prj3.umt:261:18">prj3-sol</a> directory contains a start for your
+project.  It contains the following files:
+</p><dl data-coord="prj3.umt:264:0"><dt data-coord="prj3.umt:264:4"> <a href="./prj3-sol/sensors-ws.js?colorize=true" data-coord="prj3.umt:264:43">sensors-ws.js</a></dt><dd data-coord="prj3.umt:265:0"><p data-coord="prj3.umt:265:6">This skeleton file constitutes the guts of your project.  You
+will need to flesh out the skeleton, adding code as per the
+documentation.  You should feel free to add any auxiliary
+function or method definitions as required.
+</p></dd><dt data-coord="prj3.umt:270:4"> <a href="./prj3-sol/sensors.js?colorize=true" data-coord="prj3.umt:270:40">sensors.js</a></dt><dd data-coord="prj3.umt:271:0"><p data-coord="prj3.umt:271:6">This file is adapted from the solution to <em data-coord="prj3.umt:271:75"><a href="../prj2/prj2.html" data-coord="prj3.umt:271:75">Project 2</a></em>.  The only change is to have the <samp data-coord="prj3.umt:271:120">findSensorTypes()</samp>
+and <samp data-coord="prj3.umt:271:150">findSensors()</samp> return a <samp data-coord="prj3.umt:271:175">previousIndex</samp> property to
+allow scrolling backwards in the results.
+</p><p data-coord="prj3.umt:276:6">You should feel free to replace this file with that from
+your solution to <em data-coord="prj3.umt:276:107"><a href="../prj2/prj2.html" data-coord="prj3.umt:276:107">Project 2</a></em> with
+suitable modifications.
+</p></dd><dt data-coord="prj3.umt:280:4"> <a href="./prj3-sol/index.js?colorize=true" data-coord="prj3.umt:280:38">index.js</a></dt><dd data-coord="prj3.umt:281:0"><p data-coord="prj3.umt:281:6">This file provides the complete command-line behavior which is
+required by your program.  It requires
+<a href="./prj3-sol/sensors.js?colorize=true" data-coord="prj3.umt:281:159">sensors.js</a> and
+<a href="./prj3-sol/sensors-ws.js?colorize=true" data-coord="prj3.umt:281:222">sensors-ws.js.</a>  You
+<strong data-coord="prj3.umt:281:248">must not</strong> modify this file.
+</p></dd><dt data-coord="prj3.umt:287:4"> <a href="./prj3-sol/app-error.js?colorize=true" data-coord="prj3.umt:287:42">app-error.js</a></dt><dd data-coord="prj3.umt:288:0"><p data-coord="prj3.umt:288:6">A trival class for application errors.
+</p></dd><dt data-coord="prj3.umt:290:4"> <a href="./prj3-sol/validate.js?colorize=true" data-coord="prj3.umt:290:41">validate.js</a></dt><dd data-coord="prj3.umt:291:0"><p data-coord="prj3.umt:291:6">Validation code from the previous project with a bug
+fix which ensures that when <samp data-coord="prj3.umt:291:93">findSensor()</samp> is provided
+with a <samp data-coord="prj3.umt:291:133">period</samp> search parameter, then that <samp data-coord="prj3.umt:291:170">period</samp> is
+treated as an integer.
+</p></dd><dt data-coord="prj3.umt:296:4"> <a href="./prj3-sol/README" data-coord="prj3.umt:296:22">README</a></dt><dd data-coord="prj3.umt:297:0"><p data-coord="prj3.umt:297:6">A README file which must be submitted along with your project.
+It contains an initial header which you must complete (replace
+the dummy entries with your name, B-number and email address at
+which you would like to receive project-related email).  After
+the header you may include any content which you would like read
+during the grading of your project.
+</p></dd></dl><p data-coord="prj3.umt:304:0">Additionally, the <em data-coord="prj3.umt:304:41"><a href="../../data/sensors/" data-coord="prj3.umt:304:41">course data directory</a></em>
+contains sensor data files.  It's content is identical to the previous
+project.
+</p></section><section data-coord="prj3.umt:308:0"><h2 data-coord="prj3.umt:308:0">Hints</h2><p data-coord="prj3.umt:311:0">You will need to use some kind of web service client for testing the
+services you are implementing.  The recommended command-line client is
+<a href="https://curl.haxx.se/" data-coord="prj3.umt:311:165">curl;</a> it's use is illustrated by the sample
+<a href="aux-files/sensors.LOG" data-coord="prj3.umt:311:234">log.</a>  There are no strong recommendations for
+GUI clients; possibilities include <a href="https://restlet.com/" data-coord="prj3.umt:311:339">restlet</a> and
+<a href="https://yet-another-rest-client.com/" data-coord="prj3.umt:311:391">yarc.</a>
+</p><p data-coord="prj3.umt:318:0">The following steps are not prescriptive in that you may choose to
+ignore them as long as you meet all project requirements.
+</p><ol data-coord="prj3.umt:321:0"><li data-coord="prj3.umt:321:0"><p data-coord="prj3.umt:321:4">Read the project requirements thoroughly.  Look at the sample log
+to make sure you understand the necessary behavior.  Review the
+material covered in class including the
+<a href="../../slides/user-ws/code/user-ws" data-coord="prj3.umt:321:223">user-ws</a> example and the
+<a href="https://expressjs.com/" data-coord="prj3.umt:321:277">express.js</a> documentation.
+</p><p data-coord="prj3.umt:327:4">Based on the above, think seriously about how you would implement
+the project.  Even though there are 9 separate methods, there is
+a lot of commonality between the methods.  It is possible to
+factor out this commanality so that you need far fewer than 9
+separate handlers.  The fact that JavaScript allows first-class
+functions makes the factoring out very easy.
+</p></li><li data-coord="prj3.umt:334:0"><p data-coord="prj3.umt:334:4">Start your project by copying in the provided files into your
+<samp data-coord="prj3.umt:334:70">work</samp> directory:
+</p><pre data-coord="prj3.umt:338:0">    $ cd ~/i?44/work  #change into your work directory
+    $ cp -pr $HOME/cs544/projects/prj3/prj3-sol .
+</pre><p data-coord="prj3.umt:342:4">This should copy in the <samp data-coord="prj3.umt:342:28">README</samp> template, the <samp data-coord="prj3.umt:342:51">index.js</samp>, the
+<samp data-coord="prj3.umt:342:71">sensors.js</samp> file and the utility files <samp data-coord="prj3.umt:342:111">app-error.js</samp> and
+<samp data-coord="prj3.umt:342:134">validate.js</samp> as well as the <samp data-coord="prj3.umt:342:163">sensors-ws.js</samp> skeleton file into a
+newly created <samp data-coord="prj3.umt:342:218">work/prj3-sol</samp> directory.
+</p></li><li data-coord="prj3.umt:347:0"><p data-coord="prj3.umt:347:4">Change into the newly created <samp data-coord="prj3.umt:347:34">prj3-sol</samp> directory and initialize
+your project by running <samp data-coord="prj3.umt:347:98">npm init</samp>.  Specifically:
+</p><pre data-coord="prj3.umt:351:0">    $ cd prj3-sol
+    $ npm init -y
+</pre><p data-coord="prj3.umt:355:4">This will create a <samp data-coord="prj3.umt:355:23">package.json</samp> file; this file should be
+committed to your repository.
+</p></li><li data-coord="prj3.umt:358:0"><p data-coord="prj3.umt:358:4">Install necessary external packages <samp data-coord="prj3.umt:358:40">cors</samp>, <samp data-coord="prj3.umt:358:48">mongodb</samp>, <samp data-coord="prj3.umt:358:59">express</samp>
+and <samp data-coord="prj3.umt:358:77">body-parser</samp>:
+</p><pre data-coord="prj3.umt:362:0">    $ npm install mongodb cors express body-parser
+</pre><p data-coord="prj3.umt:365:4">The libraries and dependencies will be installed into a
+<samp data-coord="prj3.umt:365:64">node_modules</samp> directory created within your current directory.
+It will also create a <samp data-coord="prj3.umt:365:154">package-lock.json</samp> which must be committed
+into your git repository.  The <samp data-coord="prj3.umt:365:233">node_modules</samp> directory should
+<strong data-coord="prj3.umt:365:269">not</strong> be committed to git.
+</p></li><li data-coord="prj3.umt:371:0"><p data-coord="prj3.umt:371:4">You should be able to run the project enough to get a usage
+message:
+</p><pre data-coord="prj3.umt:376:0">    $ ./index.js 
+    usage: index.js PORT MONGO_DB_URL \
+      [ SENSOR_TYPES_JSON SENSORS_JSON SENSOR_DATA_JSON ]
+</pre></li><li data-coord="prj3.umt:381:0"><p data-coord="prj3.umt:381:4">Replace the <samp data-coord="prj3.umt:381:16">XXX</samp> entries in the <samp data-coord="prj3.umt:381:37">README</samp> template.
+</p></li><li data-coord="prj3.umt:384:0"><p data-coord="prj3.umt:384:4">Commit your project to github:
+</p><pre data-coord="prj3.umt:387:0">    $ git add .
+    $ git commit -a -m 'started prj3'
+</pre></li><li data-coord="prj3.umt:391:0"><p data-coord="prj3.umt:391:4">Unlike your previous projects, the provided <samp data-coord="prj3.umt:391:48">sensors-ws.js</samp>
+skeleton file is extremely bare.  To start with, work off the
+<a href="../../slides/user-ws/code/user-ws" data-coord="prj3.umt:391:171">user-ws</a> example covered in
+class to create an <samp data-coord="prj3.umt:391:221">express app</samp> and have it listen on the
+specified <samp data-coord="prj3.umt:391:275">port</samp> and print out a message with the <samp data-coord="prj3.umt:391:315">listen</samp>
+handler.
+</p></li><li data-coord="prj3.umt:398:0"><p data-coord="prj3.umt:398:4">Again, working off the <a href="../../slides/user-ws/code/user-ws" data-coord="prj3.umt:398:68">user-ws</a> example, start adding routing to your code.  Add a route
+to a handler for <samp data-coord="prj3.umt:398:154">GET /sensor-type</samp> and use <samp data-coord="prj3.umt:398:181">curl</samp> or a REST
+client to hit that handler.  Use <samp data-coord="prj3.umt:398:235">console.log()</samp> or a debugger
+to ensure that the handler gets hit.
+</p></li><li data-coord="prj3.umt:404:0"><p data-coord="prj3.umt:404:4">Add code to implement the full functionality for <samp data-coord="prj3.umt:404:53">GET
+    /sensor-types</samp>.  Most of the work can be done by the
+<samp data-coord="prj3.umt:404:119">sensors.findSensorType()</samp> method.  You will just need to
+translate the web inputs (query parameters) to the input
+parameters to the method and the result of the method to a JSON
+web response.  You will also need to translate any exceptions
+thrown by the method to suitable HTTP status codes and a JSON
+error response.  For now, you can ignore the HATEOAS <samp data-coord="prj3.umt:404:495">self</samp>,
+<samp data-coord="prj3.umt:404:507">next</samp> and <samp data-coord="prj3.umt:404:518">prev</samp> properties.
+</p><p data-coord="prj3.umt:414:4">For error handling, catch any errors which are thrown by the
+underlying code, log them on standard error and massage them
+errors into the JSON required by the project specifications.
+Again, use the error handling in the
+<a href="../../slides/user-ws/code/user-ws" data-coord="prj3.umt:414:277">user-ws</a> example as a guide.
+</p><p data-coord="prj3.umt:420:4">Test using <samp data-coord="prj3.umt:420:15">curl</samp> or any REST client until you have this working
+reasonably well.
+</p></li><li data-coord="prj3.umt:423:0"><p data-coord="prj3.umt:423:4">Consider implementing <samp data-coord="prj3.umt:423:26">GET /sensors</samp>.  You should see that this
+is very similar to <samp data-coord="prj3.umt:423:91">GET /sensor-types</samp>.  Refactor your sensor-types
+code so that it can handle both sensor-types and sensors.
+</p></li><li data-coord="prj3.umt:427:0"><p data-coord="prj3.umt:427:4">Consider implementing <samp data-coord="prj3.umt:427:26">GET /sensor-types/</samp><em data-coord="prj3.umt:427:50">ID</em> and <samp data-coord="prj3.umt:427:59">GET
+    /sensors/</samp><em data-coord="prj3.umt:427:82">ID</em>.  Again, it may be possible to refactor your
+earlier handler to handle these too.
+</p></li><li data-coord="prj3.umt:431:0"><p data-coord="prj3.umt:431:4">Implement the <samp data-coord="prj3.umt:431:18">POST /sensor-types/</samp> and <samp data-coord="prj3.umt:431:44">POST /sensors/</samp> methods.
+Again, most of the work will be done by the <samp data-coord="prj3.umt:431:118">sensors</samp> object.
+What you will need is to pull the passed-in data from the web
+request body and pass it into the corresponding <samp data-coord="prj3.umt:431:254">sensor</samp> method.
+</p></li><li data-coord="prj3.umt:436:0"><p data-coord="prj3.umt:436:4">Implement the methods for sensor-data.  These will be very similar
+to your earlier methods.
+</p></li><li data-coord="prj3.umt:439:0"><p data-coord="prj3.umt:439:4">Add support for the HATEOAS <samp data-coord="prj3.umt:439:32">self</samp>, <samp data-coord="prj3.umt:439:40">next</samp> and <samp data-coord="prj3.umt:439:51">prev</samp> properties.
+</p></li><li data-coord="prj3.umt:441:0"><p data-coord="prj3.umt:441:4">Iterate until you meet all requirements.  
+</p></li></ol><p data-coord="prj3.umt:443:0">It is a good idea to commit and push your project periodically
+whenever you have made significant changes.  When it is complete
+please follow the procedure given in the
+<em data-coord="prj3.umt:443:214"><a href="../../misc/github-setup/github-setup.html" data-coord="prj3.umt:443:214">github setup directions</a></em>
+to submit your project using the <samp data-coord="prj3.umt:443:273">submit</samp> directory.
+</p></section></section>
+    </div> <!-- #content -->
+  </body>
+</html>

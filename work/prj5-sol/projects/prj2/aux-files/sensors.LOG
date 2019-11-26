@@ -1,0 +1,463 @@
+# set up env var for data-dir
+$ export DATA=/home/umrigar/cs544/data/sensors
+
+# show usage message
+$ ./index.js
+usage: index.js MONGO_DB_URL CMD [ARGS...]
+Command CMD can be
+add   sensor-type|sensor|sensor-data NAME=VALUE...
+clear clear all sensor data
+find  sensor-type|sensor|sensor-data [NAME=VALUE...]
+help  output this message
+load  sensor-type|sensor|sensor-data JSON_FILE...
+
+# clear db
+$ ./index.js mongodb://localhost:27017/sensors clear
+
+# show contents of data-dir
+$ ls $DATA
+common.js	      err-sensor-types.json  sensor-data.json
+err-sensor-data.json  make-rand-data.js      sensors.json
+err-sensors.json      make-rand-sensors.js   sensor-types.json
+
+# load erroneous sensor-types file
+$ ./index.js mongodb://localhost:27017/sensors load sensor-type \
+             $DATA/err-sensor-types.json
+err-sensor-types.json: record: 1: MISSING: missing value for id
+err-sensor-types.json: record: 1: MISSING: missing value for quantity
+err-sensor-types.json: record: 1: TYPE: value 100x for limits.min is not a number
+
+# load erroneous sensors file
+$ ./index.js mongodb://localhost:27017/sensors load sensor \
+             $DATA/err-sensors.json
+err-sensors.json: record: 1: MISSING: missing value for id
+err-sensors.json: record: 1: TYPE: value 93.0 for period is not an integer
+err-sensors.json: record: 1: TYPE: value 755x for expected.max is not a number
+
+# load erroneous sensor-data file
+$ ./index.js mongodb://localhost:27017/sensors load sensor-data \
+             $DATA/err-sensor-data.json
+err-sensor-data.json: record: 1: MISSING: missing value for sensorId
+err-sensor-data.json: record: 1: TYPE: value 1567217758561.0 for timestamp is not an integer
+err-sensor-data.json: record: 2: TYPE: value 1567217758561.AA for timestamp is not an integer
+
+# load good data files
+$ ./index.js mongodb://localhost:27017/sensors load sensor-type \
+             $DATA/sensor-types.json
+$ ./index.js mongodb://localhost:27017/sensors load sensor \
+             $DATA/sensors.json
+$ ./index.js mongodb://localhost:27017/sensors load sensor-data
+             $DATA/sensor-data.json
+
+#look for sensor-type having particular id
+$ ./index.js mongodb://localhost:27017/sensors find sensor-type id=hw-p443jk
+{
+  "data": [
+    {
+      "id": "hw-p443jk",
+      "manufacturer": "Honeywell",
+      "modelNumber": "P443JK",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 0.5,
+        "max": 50
+      }
+    }
+  ],
+  "nextIndex": -1
+}
+
+# look for all sensor types filtered by manufacturer and quantity.
+# note that shell allows us to specify search parameters containing spaces
+$ ./index.js mongodb://localhost:27017/sensors find sensor-type \
+             manufacturer="General Electric" quantity=pressure
+{
+  "data": [
+    {
+      "id": "ge-p92b",
+      "manufacturer": "General Electric",
+      "modelNumber": "P92B",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 10,
+        "max": 200
+      }
+    }
+  ],
+  "nextIndex": -1
+}
+
+# look for up to 5 GE sensor-types
+$ ./index.js mongodb://localhost:27017/sensors find sensor-type \
+  	     manufacturer="General Electric"
+{
+  "data": [
+    {
+      "id": "ge-f26x",
+      "manufacturer": "General Electric",
+      "modelNumber": "F26x",
+      "quantity": "flow",
+      "unit": "gpm",
+      "limits": {
+        "min": 0,
+        "max": 200
+      }
+    },
+    {
+      "id": "ge-h47a",
+      "manufacturer": "General Electric",
+      "modelNumber": "H47A",
+      "quantity": "humidity",
+      "unit": "%",
+      "limits": {
+        "min": 0,
+        "max": 120
+      }
+    },
+    {
+      "id": "ge-p92b",
+      "manufacturer": "General Electric",
+      "modelNumber": "P92B",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 10,
+        "max": 200
+      }
+    },
+    {
+      "id": "ge-t37c",
+      "manufacturer": "General Electric",
+      "modelNumber": "T37C",
+      "quantity": "temperature",
+      "unit": "C",
+      "limits": {
+        "min": 100,
+        "max": 800
+      }
+    }
+  ],
+  "nextIndex": -1
+}
+
+# specify "paging" parameters
+$ ./index.js mongodb://localhost:27017/sensors find sensor-type \
+             manufacturer="General Electric" _index=1 _count=2
+{
+  "data": [
+    {
+      "id": "ge-h47a",
+      "manufacturer": "General Electric",
+      "modelNumber": "H47A",
+      "quantity": "humidity",
+      "unit": "%",
+      "limits": {
+        "min": 0,
+        "max": 120
+      }
+    },
+    {
+      "id": "ge-p92b",
+      "manufacturer": "General Electric",
+      "modelNumber": "P92B",
+      "quantity": "pressure",
+      "unit": "PSI",
+      "limits": {
+        "min": 10,
+        "max": 200
+      }
+    }
+  ],
+  "nextIndex": 3
+}
+
+#look for up to 5 starting at _index 3
+$ ./index.js mongodb://localhost:27017/sensors find sensor-type \
+  	     manufacturer="General Electric" _index=3
+{
+  "data": [
+    {
+      "id": "ge-t37c",
+      "manufacturer": "General Electric",
+      "modelNumber": "T37C",
+      "quantity": "temperature",
+      "unit": "C",
+      "limits": {
+        "min": 100,
+        "max": 800
+      }
+    }
+  ],
+  "nextIndex": -1
+}
+
+# look for up to 5 sensors for a particular model
+$ ./index.js mongodb://localhost:27017/sensors find sensor model=ge-t37c
+{
+  "data": [
+    {
+      "id": "233y",
+      "model": "ge-t37c",
+      "period": 93,
+      "expected": {
+        "min": 190,
+        "max": 755
+      }
+    },
+    {
+      "id": "238u",
+      "model": "ge-t37c",
+      "period": 63,
+      "expected": {
+        "min": 156,
+        "max": 634
+      }
+    },
+    {
+      "id": "23dq",
+      "model": "ge-t37c",
+      "period": 96,
+      "expected": {
+        "min": 336,
+        "max": 732
+      }
+    },
+    {
+      "id": "23im",
+      "model": "ge-t37c",
+      "period": 25,
+      "expected": {
+        "min": 191,
+        "max": 778
+      }
+    },
+    {
+      "id": "23ni",
+      "model": "ge-t37c",
+      "period": 59,
+      "expected": {
+        "min": 366,
+        "max": 770
+      }
+    }
+  ],
+  "nextIndex": 5
+}
+
+# show use of "paging" parameters
+$ ./index.js mongodb://localhost:27017/sensors find sensor \
+  	     model=ge-t37c _index=4 _count=2
+{
+  "data": [
+    {
+      "id": "23ni",
+      "model": "ge-t37c",
+      "period": 59,
+      "expected": {
+        "min": 366,
+        "max": 770
+      }
+    },
+    {
+      "id": "23se",
+      "model": "ge-t37c",
+      "period": 52,
+      "expected": {
+        "min": 172,
+        "max": 790
+      }
+    }
+  ],
+  "nextIndex": 6
+}
+
+# look for data from a particular sensor
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data sensorId=23se
+{
+  "data": [
+    {
+      "timestamp": 1567217758561,
+      "value": 201,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758509,
+      "value": 424,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758457,
+      "value": 412.4,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758353,
+      "value": 762.5,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758301,
+      "value": 193.2,
+      "status": "ok"
+    }
+  ]
+}
+
+# we had a missing reading above because statuses defaulted to ok
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses=all
+{
+  "data": [
+    {
+      "timestamp": 1567217758561,
+      "value": 201,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758509,
+      "value": 424,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758457,
+      "value": 412.4,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758405,
+      "value": 170,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217758353,
+      "value": 762.5,
+      "status": "ok"
+    }
+  ]
+}
+
+# show paging using timestamp as index
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses=all timestamp=1567217758405 _count=3
+{
+  "data": [
+    {
+      "timestamp": 1567217758405,
+      "value": 170,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217758353,
+      "value": 762.5,
+      "status": "ok"
+    },
+    {
+      "timestamp": 1567217758301,
+      "value": 193.2,
+      "status": "ok"
+    }
+  ]
+}
+
+# look only for outOfRange data
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses=outOfRange _count=3
+{
+  "data": [
+    {
+      "timestamp": 1567217758405,
+      "value": 170,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217757989,
+      "value": 168,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217757521,
+      "value": 170,
+      "status": "outOfRange"
+    }
+  ]
+}
+
+# look for outOfRange or error data
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses='outOfRange|error' _count=3
+{
+  "data": [
+    {
+      "timestamp": 1567217758405,
+      "value": 170,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217757989,
+      "value": 168,
+      "status": "outOfRange"
+    },
+    {
+      "timestamp": 1567217757625,
+      "value": 803,
+      "status": "error"
+    }
+  ]
+}
+
+# show details
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses='outOfRange|error' _count=1 _doDetail=true
+{
+  "data": [
+    {
+      "timestamp": 1567217758405,
+      "value": 170,
+      "status": "outOfRange"
+    }
+  ],
+  "sensorType": {
+    "id": "ge-t37c",
+    "manufacturer": "General Electric",
+    "modelNumber": "T37C",
+    "quantity": "temperature",
+    "unit": "C",
+    "limits": {
+      "min": 100,
+      "max": 800
+    }
+  },
+  "sensor": {
+    "id": "23se",
+    "model": "ge-t37c",
+    "period": 52,
+    "expected": {
+      "min": 172,
+      "max": 790
+    }
+  }
+}
+
+# cannot use _id as a search parameter
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses='outOfRange|error' _id=99
+RESERVED: the _id parameter is reserved for internal use only
+
+# catch bad types
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data \
+  	     sensorId=23se statuses='outOfRange|error' _count=1x
+TYPE: value 1x for _count is not an integer
+
+# required parameter not found: flagged as an error
+$ ./index.js mongodb://localhost:27017/sensors find sensor-data sensorId=23
+X_ID: unknown sensor id "23"
+
+# filter parameter not found: simply empty results
+$ ./index.js mongodb://localhost:27017/sensors find sensor model=23
+{
+  "data": [],
+  "nextIndex": -1
+}
+$ 
